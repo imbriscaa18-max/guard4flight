@@ -711,15 +711,15 @@ export default function FlightPriceFinder() {
             <div className="text-center mb-8">
               <Button
                 asChild
-                className="bg-gray-900 hover:bg-black text-white font-bold px-8 py-4 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 animate-glow text-lg border-0"
-                style={{ backgroundColor: "#111827", color: "#ffffff" }}
+                className="vpn-button-override bg-slate-900 hover:bg-black text-white font-bold px-8 py-4 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 animate-glow text-lg border-0"
+                style={{ backgroundColor: "#0f172a", color: "#ffffff" }}
               >
                 <a
                   href="https://go.nordvpn.net/SHA9a"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-white no-underline flex items-center gap-3"
-                  style={{ color: "#ffffff" }}
+                  className="vpn-button-override text-white no-underline flex items-center gap-3"
+                  style={{ color: "#ffffff", backgroundColor: "#0f172a" }}
                 >
                   <Globe className="w-6 h-6 text-white" style={{ color: "#ffffff" }} />
                   <span className="text-white" style={{ color: "#ffffff" }}>
@@ -860,16 +860,16 @@ export default function FlightPriceFinder() {
 
         {priceComparisons.length > 0 && (
           <div className="mt-12 animate-fade-in-up animate-delay-600">
-            <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-l-4 border-yellow-400 rounded-xl p-6 mb-8 shadow-lg">
+            <div className="bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-500 rounded-xl p-6 mb-8 shadow-lg">
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center">
-                    <span className="text-yellow-800 font-bold text-lg">⚠️</span>
+                  <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                    <span className="text-white font-bold text-lg">!</span>
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-yellow-800 mb-2">WARNING / AVERTISMENT</h3>
-                  <p className="text-yellow-700 font-medium">
+                  <h3 className="text-lg font-bold text-red-800 mb-2">WARNING / AVERTISMENT</h3>
+                  <p className="text-red-700 font-medium">
                     {language === "ro"
                       ? "Prețurile pot suferi ajustări imediate și nu pot coincide întotdeauna cu cele din rezultat. Verificați întotdeauna prețurile pe site-urile oficiale înainte de rezervare."
                       : "Prices may change immediately and may not always match the results shown. Always verify prices on official websites before booking."}

@@ -496,3 +496,37 @@ button[type="submit"] .text-white {
   background: #1e293b !important;
   backdrop-filter: none !important;
 }
+
+/* Adding specific VPN button class with maximum specificity to force dark background */
+.vpn-button-override {
+  background: #0f172a !important;
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+}
+
+.vpn-button-override * {
+  color: #ffffff !important;
+  background: transparent !important;
+}
+
+.vpn-button-override:hover {
+  background: #020617 !important;
+  background-color: #020617 !important;
+}
+
+/* Force VPN button styling with highest specificity */
+button.vpn-button-override,
+a.vpn-button-override {
+  background: #0f172a !important;
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+button.vpn-button-override span,
+a.vpn-button-override span,
+button.vpn-button-override .text-white,
+a.vpn-button-override .text-white {
+  color: #ffffff !important;
+  background: transparent !important;
+}

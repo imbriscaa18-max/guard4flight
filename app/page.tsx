@@ -613,7 +613,7 @@ export default function FlightPriceFinder() {
               </button>
 
               {showLanguageMenu && (
-                <div className="absolute top-full right-0 mt-2 bg-card border border-border rounded-xl shadow-2xl p-2 z-50 animate-scale-in min-w-[160px]">
+                <div className="absolute top-full left-0 mt-2 bg-card border border-border rounded-xl shadow-2xl p-2 z-50 animate-slide-in-left min-w-[160px]">
                   {[
                     { code: "ro", flag: "🇷🇴", name: "Română" },
                     { code: "en", flag: "🇺🇸", name: "English" },
@@ -884,6 +884,22 @@ export default function FlightPriceFinder() {
           </div>
         )}
       </main>
+
+      <footer className="relative z-10 mt-16 pb-8">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="text-center">
+            <p className="text-sm text-red-600 font-medium bg-red-50 rounded-lg px-4 py-2 inline-block border border-red-200">
+              {language === "ro"
+                ? "Prețurile pot suferi ajustări imediate și nu pot coincide cu cele din rezultat"
+                : language === "en"
+                  ? "Prices may change immediately and may not match the results shown"
+                  : language === "fr"
+                    ? "Les prix peuvent changer immédiatement et ne pas correspondre aux résultats affichés"
+                    : "Los precios pueden cambiar inmediatamente y no coincidir con los resultados mostrados"}
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }

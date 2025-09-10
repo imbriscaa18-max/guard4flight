@@ -1,6 +1,5 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { ClerkProvider, SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs"
 import { Inter, JetBrains_Mono } from "next/font/google"
 import "./globals.css"
 
@@ -25,47 +24,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
-
-  if (!publishableKey) {
-    return (
-      <html lang="en">
-        <body className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}>
-          <div className="flex items-center justify-center min-h-screen">
-            <div className="text-center">
-              <h1 className="text-2xl font-bold text-red-600 mb-4">Configuration Error</h1>
-              <p className="text-gray-600">Missing Clerk publishable key. Please check your environment variables.</p>
-            </div>
-          </div>
-        </body>
-      </html>
-    )
-  }
-
   return (
-    <ClerkProvider publishableKey={publishableKey}>
-      <html lang="en">
-        <body className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}>
-          <header className="flex justify-end items-center p-4 gap-4 h-16 bg-white/80 backdrop-blur-sm border-b border-blue-100">
-            <SignedOut>
-              <SignInButton>
-                <button className="text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors">
-                  Sign In
-                </button>
-              </SignInButton>
-              <SignUpButton>
-                <button className="bg-blue-600 hover:bg-blue-700 text-white rounded-full font-medium text-sm h-10 px-5 cursor-pointer transition-colors">
-                  Sign Up
-                </button>
-              </SignUpButton>
-            </SignedOut>
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
-          </header>
-          {children}
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en">
+      <body className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}>{children}</body>
+    </html>
   )
 }

@@ -7,297 +7,20 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import {
-  Plane,
-  Search,
-  Globe,
-  CreditCard,
-  User,
-  ChevronDown,
-  X,
-  Clock,
-  MapPin,
-  ExternalLink,
-  Wallet,
-  History,
-  Settings,
-  Plus,
-  BarChart3,
-  Star,
-  ChevronUp,
-  TrendingDown,
-} from "lucide-react"
+import { Plane, TrendingDown, CreditCard, User, ChevronDown, Wallet, X, Settings, Plus, BarChart3 } from "lucide-react"
 import { useUser, useClerk } from "@clerk/nextjs"
+import countries from "@/data/countries" // Importing countries data
 
 interface PriceComparison {
   country: string
-  flag: string
   price: number
   currency: string
-  savings?: number
-  bookingUrl?: string
-  airline?: string
-  duration?: string
-  isOfficial?: boolean
+  airline: string
+  duration: string
+  isOfficial: boolean
+  bookingUrl: string
+  flag: string
 }
-
-const translations = {
-  ro: {
-    title: "Guard4Flight",
-    subtitle: "Găsește cel mai mic preț pentru biletele de avion din",
-    countries: "țări",
-    searchTitle: "Caută după numărul zborului",
-    searchDescription: "Introdu numărul zborului pentru a compara prețurile din",
-    countriesGlobal: "țări de pe tot globul",
-    flightNumber: "Numărul zborului",
-    searchInProgress: "Căutare în progres...",
-    searchPrices: "Caută prețuri în",
-    countriesVerified: "țări verificate",
-    lowestPrice: "Cel mai mic preț",
-    highestPrice: "Cel mai scump preț",
-    potentialSavings: "Economie potențială",
-    countriesChecked: "Țări verificate",
-    globalComparison: "Comparație globală",
-    bestDeal: "Cel mai bun",
-    maxDifference: "Diferența maximă",
-    vsHighest: "Față de cel mai scump",
-    importantNote: "Notă importantă",
-    priceDisclaimer:
-      "Prețurile afișate sunt orientative și pot suferi modificări de la ultima verificare a datelor. Vă recomandăm să verificați prețurile finale pe site-urile oficiale ale companiilor aeriene.",
-    priceComparison: "Comparație prețuri pentru zborul",
-    priceDescription: "Prețurile sunt afișate în ordine crescătoare din",
-    clickReserve: 'țări verificate. Click pe "Rezervă acum" pentru a accesa site-ul oficial.',
-    cheapest: "Cel mai ieftin",
-    reserveNow: "Rezervă acum",
-    unofficialSite: "Site neoficial",
-    showLess: "Arată mai puține țări",
-    showAll: "Vezi toate cele",
-    andMore: "Și încă",
-    moreCountries: "țări verificate...",
-    tipsTitle: "Sfaturi pentru economii maxime",
-    tip1: "Folosește un VPN pentru a accesa site-urile din țara cu cel mai mic preț",
-    tip2: "Verifică dacă există taxe suplimentare pentru plăți din alte țări",
-    tip3: "Compară prețurile pe mai multe site-uri de booking din țara selectată",
-    tip4: "Ia în considerare costurile suplimentare (bagaje, locuri, etc.)",
-    searchToStart: "Caută un zbor pentru a începe",
-    searchDescription2: "Introdu numărul zborului pentru a compara prețurile din",
-    findBestDeals: "țări de pe tot globul și să găsești cele mai bune oferte disponibile.",
-    vsLowest: "față de cel mai ieftin",
-    loginRequired: "Trebuie să te autentifici pentru a căuta zboruri",
-  },
-  en: {
-    title: "Guard4Flight",
-    subtitle: "Find the lowest price for flight tickets from",
-    countries: "countries",
-    searchTitle: "Search by flight number",
-    searchDescription: "Enter the flight number to compare prices from",
-    countriesGlobal: "countries worldwide",
-    flightNumber: "Flight number",
-    searchInProgress: "Search in progress...",
-    searchPrices: "Search prices in",
-    countriesVerified: "countries verified",
-    lowestPrice: "Lowest price",
-    highestPrice: "Highest price",
-    potentialSavings: "Potential savings",
-    countriesChecked: "Countries checked",
-    globalComparison: "Global comparison",
-    bestDeal: "Best deal",
-    maxDifference: "Maximum difference",
-    vsHighest: "Compared to highest",
-    importantNote: "Important note",
-    priceDisclaimer:
-      "Displayed prices are indicative and may change since the last data verification. We recommend checking final prices on official airline websites.",
-    priceComparison: "Price comparison for flight",
-    priceDescription: "Prices are displayed in ascending order from",
-    clickReserve: 'verified countries. Click "Reserve now" to access the official website.',
-    cheapest: "Cheapest",
-    reserveNow: "Reserve now",
-    unofficialSite: "Unofficial site",
-    showLess: "Show fewer countries",
-    showAll: "See all",
-    andMore: "And",
-    moreCountries: "more verified countries...",
-    tipsTitle: "Tips for maximum savings",
-    tip1: "Use a VPN to access websites from the country with the lowest price",
-    tip2: "Check if there are additional fees for payments from other countries",
-    tip3: "Compare prices on multiple booking sites from the selected country",
-    tip4: "Consider additional costs (baggage, seats, etc.)",
-    searchToStart: "Search for a flight to begin",
-    searchDescription2: "Enter the flight number to compare prices from",
-    findBestDeals: "countries worldwide and find the best available deals.",
-    vsLowest: "compared to cheapest",
-    loginRequired: "You must log in to search for flights",
-  },
-  fr: {
-    title: "Guard4Flight",
-    subtitle: "Trouvez le prix le plus bas pour les billets d'avion de",
-    countries: "pays",
-    searchTitle: "Rechercher par numéro de vol",
-    searchDescription: "Entrez le numéro de vol pour comparer les prix de",
-    countriesGlobal: "pays du monde entier",
-    flightNumber: "Numéro de vol",
-    searchInProgress: "Recherche en cours...",
-    searchPrices: "Rechercher les prix dans",
-    countriesVerified: "pays vérifiés",
-    lowestPrice: "Prix le plus bas",
-    highestPrice: "Prix le plus élevé",
-    potentialSavings: "Économies potentielles",
-    countriesChecked: "Pays vérifiés",
-    globalComparison: "Comparaison mondiale",
-    bestDeal: "Meilleure offre",
-    maxDifference: "Différence maximale",
-    vsHighest: "Par rapport au plus élevé",
-    importantNote: "Note importante",
-    priceDisclaimer:
-      "Les prix affichés sont indicatifs et peuvent changer depuis la dernière vérification des données. Nous recommandons de vérifier les prix finaux sur les sites officiels des compagnies aériennes.",
-    priceComparison: "Comparaison des prix pour le vol",
-    priceDescription: "Les prix sont affichés par ordre croissant de",
-    clickReserve: 'pays vérifiés. Cliquez sur "Réserver maintenant" pour accéder au site officiel.',
-    cheapest: "Le moins cher",
-    reserveNow: "Réserver maintenant",
-    unofficialSite: "Site non officiel",
-    showLess: "Afficher moins de pays",
-    showAll: "Voir tous les",
-    andMore: "Et",
-    moreCountries: "pays vérifiés de plus...",
-    tipsTitle: "Conseils pour des économies maximales",
-    tip1: "Utilisez un VPN pour accéder aux sites du pays avec le prix le plus bas",
-    tip2: "Vérifiez s'il y a des frais supplémentaires pour les paiements d'autres pays",
-    tip3: "Comparez les prix sur plusieurs sites de réservation du pays sélectionné",
-    tip4: "Considérez les coûts supplémentaires (bagages, sièges, etc.)",
-    searchToStart: "Recherchez un vol pour commencer",
-    searchDescription2: "Entrez le numéro de vol pour comparer les prix de",
-    findBestDeals: "pays du monde entier et trouvez les meilleures offres disponibles.",
-    vsLowest: "par rapport au moins cher",
-    loginRequired: "Vous devez vous connecter pour rechercher des vols",
-  },
-  es: {
-    title: "Guard4Flight",
-    subtitle: "Encuentra el precio más bajo para billetes de avión de",
-    countries: "países",
-    searchTitle: "Buscar por número de vuelo",
-    searchDescription: "Ingresa el número de vuelo para comparar precios de",
-    countriesGlobal: "países de todo el mundo",
-    flightNumber: "Número de vuelo",
-    searchInProgress: "Búsqueda en progreso...",
-    searchPrices: "Buscar precios en",
-    countriesVerified: "países verificados",
-    lowestPrice: "Precio más bajo",
-    highestPrice: "Precio más alto",
-    potentialSavings: "Ahorros potenciales",
-    countriesChecked: "Países verificados",
-    globalComparison: "Comparación global",
-    bestDeal: "Mejor oferta",
-    maxDifference: "Diferencia máxima",
-    vsHighest: "Comparado con el más alto",
-    importantNote: "Nota importante",
-    priceDisclaimer:
-      "Los precios mostrados son indicativos y pueden cambiar desde la última verificación de datos. Recomendamos verificar los precios finales en los sitios web oficiales de las aerolíneas.",
-    priceComparison: "Comparación de precios para el vuelo",
-    priceDescription: "Los precios se muestran en orden ascendente de",
-    clickReserve: 'países verificados. Haz clic en "Reservar ahora" para acceder al sitio oficial.',
-    cheapest: "Más barato",
-    reserveNow: "Reservar ahora",
-    unofficialSite: "Sitio no oficial",
-    showLess: "Mostrar menos países",
-    showAll: "Ver todos los",
-    andMore: "Y",
-    moreCountries: "países verificados más...",
-    tipsTitle: "Consejos para ahorros máximos",
-    tip1: "Usa una VPN para acceder a sitios web del país con el precio más bajo",
-    tip2: "Verifica si hay tarifas adicionales para pagos de otros países",
-    tip3: "Compara precios en múltiples sitios de reserva del país seleccionado",
-    tip4: "Considera costos adicionales (equipaje, asientos, etc.)",
-    searchToStart: "Busca un vuelo para comenzar",
-    searchDescription2: "Ingresa el número de vuelo para comparar precios de",
-    findBestDeals: "países de todo el mundo y encuentra las mejores ofertas disponibles.",
-    vsLowest: "comparado con el más barato",
-    loginRequired: "Debes iniciar sesión para buscar vuelos",
-  },
-}
-
-const languageFlags = {
-  ro: "🇷🇴",
-  en: "🇬🇧",
-  fr: "🇫🇷",
-  es: "🇪🇸",
-}
-
-const countries = [
-  // Europe
-  { code: "DK", name: "Danemarca", flag: "🇩🇰" },
-  { code: "DE", name: "Germania", flag: "🇩🇪" },
-  { code: "FR", name: "Franța", flag: "🇫🇷" },
-  { code: "IT", name: "Italia", flag: "🇮🇹" },
-  { code: "ES", name: "Spania", flag: "🇪🇸" },
-  { code: "NL", name: "Olanda", flag: "🇳🇱" },
-  { code: "BE", name: "Belgia", flag: "🇧🇪" },
-  { code: "AT", name: "Austria", flag: "🇦🇹" },
-  { code: "CH", name: "Elveția", flag: "🇨🇭" },
-  { code: "SE", name: "Suedia", flag: "🇸🇪" },
-  { code: "NO", name: "Norvegia", flag: "🇳🇴" },
-  { code: "FI", name: "Finlanda", flag: "🇫🇮" },
-  { code: "PL", name: "Polonia", flag: "🇵🇱" },
-  { code: "CZ", name: "Cehia", flag: "🇨🇿" },
-  { code: "HU", name: "Ungaria", flag: "🇭🇺" },
-  { code: "RO", name: "România", flag: "🇷🇴" },
-  { code: "BG", name: "Bulgaria", flag: "🇧🇬" },
-  { code: "GR", name: "Grecia", flag: "🇬🇷" },
-  { code: "PT", name: "Portugalia", flag: "🇵🇹" },
-  { code: "IE", name: "Irlanda", flag: "🇮🇪" },
-  { code: "SK", name: "Slovacia", flag: "🇸🇰" },
-  { code: "SI", name: "Slovenia", flag: "🇸🇮" },
-  { code: "HR", name: "Croația", flag: "🇭🇷" },
-  { code: "RS", name: "Serbia", flag: "🇷🇸" },
-  { code: "BA", name: "Bosnia", flag: "🇧🇦" },
-  { code: "MK", name: "Macedonia", flag: "🇲🇰" },
-  { code: "AL", name: "Albania", flag: "🇦🇱" },
-  { code: "TR", name: "Turcia", flag: "🇹🇷" },
-  { code: "EE", name: "Estonia", flag: "🇪🇪" },
-  { code: "LV", name: "Letonia", flag: "🇱🇻" },
-  { code: "LT", name: "Lituania", flag: "🇱🇹" },
-  { code: "MT", name: "Malta", flag: "🇲🇹" },
-  { code: "CY", name: "Cipru", flag: "🇨🇾" },
-  { code: "IS", name: "Islanda", flag: "🇮🇸" },
-  { code: "LU", name: "Luxemburg", flag: "🇱🇺" },
-  { code: "MC", name: "Monaco", flag: "🇲🇨" },
-  // North America
-  { code: "US", name: "SUA", flag: "🇺🇸" },
-  { code: "CA", name: "Canada", flag: "🇨🇦" },
-  { code: "MX", name: "Mexic", flag: "🇲🇽" },
-  // Asia
-  { code: "JP", name: "Japonia", flag: "🇯🇵" },
-  { code: "KR", name: "Coreea de Sud", flag: "🇰🇷" },
-  { code: "CN", name: "China", flag: "🇨🇳" },
-  { code: "IN", name: "India", flag: "🇮🇳" },
-  { code: "TH", name: "Thailanda", flag: "🇹🇭" },
-  { code: "SG", name: "Singapore", flag: "🇸🇬" },
-  { code: "MY", name: "Malaezia", flag: "🇲🇾" },
-  { code: "ID", name: "Indonezia", flag: "🇮🇩" },
-  { code: "PH", name: "Filipine", flag: "🇵🇭" },
-  { code: "VN", name: "Vietnam", flag: "🇻🇳" },
-  { code: "HK", name: "Hong Kong", flag: "🇭🇰" },
-  { code: "TW", name: "Taiwan", flag: "🇹🇼" },
-  // Middle East & Africa
-  { code: "AE", name: "Emiratele Arabe", flag: "🇦🇪" },
-  { code: "SA", name: "Arabia Saudită", flag: "🇸🇦" },
-  { code: "IL", name: "Israel", flag: "🇮🇱" },
-  { code: "ZA", name: "Africa de Sud", flag: "🇿🇦" },
-  { code: "EG", name: "Egipt", flag: "🇪🇬" },
-  { code: "MA", name: "Maroc", flag: "🇲🇦" },
-  { code: "KE", name: "Kenya", flag: "🇰🇪" },
-  { code: "NG", name: "Nigeria", flag: "🇳🇬" },
-  { code: "QA", name: "Qatar", flag: "🇶🇦" },
-  { code: "KW", name: "Kuwait", flag: "🇰🇼" },
-  // Oceania & South America
-  { code: "AU", name: "Australia", flag: "🇦🇺" },
-  { code: "NZ", name: "Noua Zeelandă", flag: "🇳🇿" },
-  { code: "BR", name: "Brazilia", flag: "🇧🇷" },
-  { code: "AR", name: "Argentina", flag: "🇦🇷" },
-  { code: "CL", name: "Chile", flag: "🇨🇱" },
-  { code: "PE", name: "Peru", flag: "🇵🇪" },
-  { code: "CO", name: "Columbia", flag: "🇨🇴" },
-]
 
 interface SearchHistoryItem {
   id: string
@@ -313,6 +36,305 @@ interface UserCredits {
   credits: number
   searchHistory: SearchHistoryItem[]
   totalSearches: number
+}
+
+const translations = {
+  ro: {
+    title: "Guard4Flight",
+    subtitle: "Găsește cel mai mic preț pentru biletele de avion",
+    flightNumber: "Numărul zborului",
+    searchPrices: "Caută prețuri în",
+    countries: "țări verificate",
+    searching: "Se caută...",
+    results: "Rezultate pentru zborul",
+    country: "Țară",
+    price: "Preț",
+    airline: "Companie aeriană",
+    duration: "Durată",
+    bookNow: "Rezervă acum",
+    skyscanner: "Skyscanner",
+    savings: "Economii",
+    compared: "față de",
+    priceDisclaimer: "Prețurile pot suferi modificări de la ultima verificare a datelor",
+    tips: "Sfaturi pentru economii maxime",
+    tip1: "Verifică prețurile în diferite țări pentru același zbor",
+    tip2: "Rezervă cu câteva săptămâni înainte pentru prețuri mai bune",
+    tip3: "Compară întotdeauna cu site-urile oficiale ale companiilor aeriene",
+    tip4: "Folosește moduri incognito pentru a evita creșterea prețurilor",
+    showAll: "Vezi toate țările verificate",
+    showLess: "Vezi mai puține",
+    credits: "credite",
+    buyCredits: "Cumpără credite",
+    dashboard: "Dashboard",
+    logout: "Deconectare",
+    searchHistory: "Istoric căutări",
+    totalSearches: "Total căutări",
+    totalSavings: "Economii totale",
+    recentSearches: "Căutări recente",
+    noSearches: "Nu ai efectuat încă căutări",
+    buyCreditsTitle: "Cumpără credite",
+    buyCreditsDesc: "Alege un pachet de credite pentru a continua căutările",
+    creditPackages: "Pachete disponibile",
+    buy: "Cumpără",
+    processing: "Se procesează...",
+    paymentSuccess: "Plata a fost procesată cu succes!",
+    creditsAdded: "Creditele au fost adăugate în contul tău.",
+    close: "Închide",
+    loginRequired: "Trebuie să te autentifici pentru a căuta prețuri",
+    searchTitle: "Caută prețuri bilete de avion",
+    searchDescription: "Introdu numărul zborului și compară prețurile în",
+    countriesGlobal: "țări",
+    countriesVerified: "țări verificate",
+    searchInProgress: "Se caută...",
+    lowestPrice: "Cel mai mic preț",
+    bestDeal: "Cea mai bună ofertă",
+    highestPrice: "Cel mai mare preț",
+    maxDifference: "Diferența maximă",
+    potentialSavings: "Economii potențiale",
+    vsHighest: "față de cel mai mare preț",
+    countriesChecked: "Țări verificate",
+    globalComparison: "Comparație globală",
+    importantNote: "Notă importantă",
+    priceDisclaimer: "Prețurile pot suferi modificări de la ultima verificare a datelor",
+    priceComparison: "Comparație prețuri",
+    priceDescription:
+      'Vezi prețurile în diferite țări și alege cea mai bună ofertă. Apasă pe "Rezervă acum" pentru a rezerva biletul.',
+    clickReserve: 'Apasă pe "Rezervă acum" pentru a rezerva biletul.',
+    reserveNow: "Rezervă acum",
+    unofficialSite: "Site neoficial",
+    cheapest: "Cel mai ieftin",
+    vsLowest: "față de cel mai mic preț",
+    showLess: "Vezi mai puține",
+    showAll: "Vezi toate",
+    andMore: "și încă",
+    moreCountries: "țări",
+    tipsTitle: "Sfaturi pentru economii maxime",
+    searchToStart: "Introdu numărul zborului pentru a începe căutarea",
+    searchDescription2: "Compară prețurile în",
+    findBestDeals: "și găsește cele mai bune oferte",
+  },
+  en: {
+    title: "Guard4Flight",
+    subtitle: "Find the cheapest flight prices",
+    flightNumber: "Flight number",
+    searchPrices: "Search prices in",
+    countries: "countries verified",
+    searching: "Searching...",
+    results: "Results for flight",
+    country: "Country",
+    price: "Price",
+    airline: "Airline",
+    duration: "Duration",
+    bookNow: "Book now",
+    skyscanner: "Skyscanner",
+    savings: "Savings",
+    compared: "compared to",
+    priceDisclaimer: "Prices may have changed since last data verification",
+    tips: "Tips for maximum savings",
+    tip1: "Check prices in different countries for the same flight",
+    tip2: "Book a few weeks in advance for better prices",
+    tip3: "Always compare with official airline websites",
+    tip4: "Use incognito mode to avoid price increases",
+    showAll: "See all verified countries",
+    showLess: "Show less",
+    credits: "credits",
+    buyCredits: "Buy credits",
+    dashboard: "Dashboard",
+    logout: "Logout",
+    searchHistory: "Search history",
+    totalSearches: "Total searches",
+    totalSavings: "Total savings",
+    recentSearches: "Recent searches",
+    noSearches: "No searches yet",
+    buyCreditsTitle: "Buy credits",
+    buyCreditsDesc: "Choose a credit package to continue searching",
+    creditPackages: "Available packages",
+    buy: "Buy",
+    processing: "Processing...",
+    paymentSuccess: "Payment processed successfully!",
+    creditsAdded: "Credits have been added to your account.",
+    close: "Close",
+    loginRequired: "You must log in to search for prices",
+    searchTitle: "Search flight ticket prices",
+    searchDescription: "Enter the flight number and compare prices in",
+    countriesGlobal: "countries",
+    countriesVerified: "countries verified",
+    searchInProgress: "Searching...",
+    lowestPrice: "Lowest price",
+    bestDeal: "Best deal",
+    highestPrice: "Highest price",
+    maxDifference: "Max difference",
+    potentialSavings: "Potential savings",
+    vsHighest: "vs highest price",
+    countriesChecked: "Countries checked",
+    globalComparison: "Global comparison",
+    importantNote: "Important note",
+    priceDisclaimer: "Prices may have changed since last data verification",
+    priceComparison: "Price comparison",
+    priceDescription:
+      'See prices in different countries and choose the best offer. Press "Book now" to book the ticket.',
+    clickReserve: 'Press "Book now" to book the ticket.',
+    reserveNow: "Book now",
+    unofficialSite: "Unofficial site",
+    cheapest: "Cheapest",
+    vsLowest: "vs lowest price",
+    showLess: "Show less",
+    showAll: "Show all",
+    andMore: "and more",
+    moreCountries: "countries",
+    tipsTitle: "Tips for maximum savings",
+    searchToStart: "Enter the flight number to start searching",
+    searchDescription2: "Compare prices in",
+    findBestDeals: "and find the best deals",
+  },
+  fr: {
+    title: "Guard4Flight",
+    subtitle: "Trouvez les prix de vols les moins chers",
+    flightNumber: "Numéro de vol",
+    searchPrices: "Rechercher les prix dans",
+    countries: "pays vérifiés",
+    searching: "Recherche...",
+    results: "Résultats pour le vol",
+    country: "Pays",
+    price: "Prix",
+    airline: "Compagnie aérienne",
+    duration: "Durée",
+    bookNow: "Réserver maintenant",
+    skyscanner: "Skyscanner",
+    savings: "Économies",
+    compared: "par rapport à",
+    priceDisclaimer: "Les prix peuvent avoir changé depuis la dernière vérification",
+    tips: "Conseils pour des économies maximales",
+    tip1: "Vérifiez les prix dans différents pays pour le même vol",
+    tip2: "Réservez quelques semaines à l'avance pour de meilleurs prix",
+    tip3: "Comparez toujours avec les sites officiels des compagnies aériennes",
+    tip4: "Utilisez le mode incognito pour éviter les augmentations de prix",
+    showAll: "Voir tous les pays vérifiés",
+    showLess: "Voir moins",
+    credits: "crédits",
+    buyCredits: "Acheter des crédits",
+    dashboard: "Tableau de bord",
+    logout: "Déconnexion",
+    searchHistory: "Historique des recherches",
+    totalSearches: "Total des recherches",
+    totalSavings: "Économies totales",
+    recentSearches: "Recherches récentes",
+    noSearches: "Aucune recherche encore",
+    buyCreditsTitle: "Acheter des crédits",
+    buyCreditsDesc: "Choisissez un forfait de crédits pour continuer à chercher",
+    creditPackages: "Forfaits disponibles",
+    buy: "Acheter",
+    processing: "Traitement...",
+    paymentSuccess: "Paiement traité avec succès!",
+    creditsAdded: "Les crédits ont été ajoutés à votre compte.",
+    close: "Fermer",
+    loginRequired: "Vous devez vous connecter pour rechercher des prix",
+    searchTitle: "Rechercher les prix des billets d'avion",
+    searchDescription: "Entrez le numéro de vol et comparez les prix dans",
+    countriesGlobal: "pays",
+    countriesVerified: "pays vérifiés",
+    searchInProgress: "Recherche...",
+    lowestPrice: "Prix le plus bas",
+    bestDeal: "Meilleure offre",
+    highestPrice: "Prix le plus élevé",
+    maxDifference: "Différence maximale",
+    potentialSavings: "Économies potentielles",
+    vsHighest: "vs prix le plus élevé",
+    countriesChecked: "Pays vérifiés",
+    globalComparison: "Comparaison globale",
+    importantNote: "Note importante",
+    priceDisclaimer: "Les prix peuvent avoir changé depuis la dernière vérification",
+    priceComparison: "Comparaison des prix",
+    priceDescription:
+      'Consultez les prix dans différents pays et choisissez la meilleure offre. Appuyez sur "Réserver maintenant" pour réserver le billet.',
+    clickReserve: 'Appuyez sur "Réserver maintenant" pour réserver le billet.',
+    reserveNow: "Réserver maintenant",
+    unofficialSite: "Site non officiel",
+    cheapest: "Le moins cher",
+    vsLowest: "vs prix le plus bas",
+    showLess: "Voir moins",
+    showAll: "Voir tous",
+    andMore: "et plus",
+    moreCountries: "pays",
+    tipsTitle: "Conseils pour des économies maximales",
+    searchToStart: "Entrez le numéro de vol pour commencer la recherche",
+    searchDescription2: "Comparez les prix dans",
+    findBestDeals: "et trouvez les meilleures offres",
+  },
+  es: {
+    title: "Guard4Flight",
+    subtitle: "Encuentra los precios de vuelos más baratos",
+    flightNumber: "Número de vuelo",
+    searchPrices: "Buscar precios en",
+    countries: "países verificados",
+    searching: "Buscando...",
+    results: "Resultados para el vuelo",
+    country: "País",
+    price: "Precio",
+    airline: "Aerolínea",
+    duration: "Duración",
+    bookNow: "Reservar ahora",
+    skyscanner: "Skyscanner",
+    savings: "Ahorros",
+    compared: "comparado con",
+    priceDisclaimer: "Los precios pueden haber cambiado desde la última verificación",
+    tips: "Consejos para ahorros máximos",
+    tip1: "Verifica precios en diferentes países para el mismo vuelo",
+    tip2: "Reserva con unas semanas de anticipación para mejores precios",
+    tip3: "Siempre compara con los sitios web oficiales de las aerolíneas",
+    tip4: "Usa modo incógnito para evitar aumentos de precios",
+    showAll: "Ver todos los países verificados",
+    showLess: "Ver menos",
+    credits: "créditos",
+    buyCredits: "Comprar créditos",
+    dashboard: "Panel de control",
+    logout: "Cerrar sesión",
+    searchHistory: "Historial de búsquedas",
+    totalSearches: "Total de búsquedas",
+    totalSavings: "Ahorros totales",
+    recentSearches: "Búsquedas recientes",
+    noSearches: "Aún no hay búsquedas",
+    buyCreditsTitle: "Comprar créditos",
+    buyCreditsDesc: "Elige un paquete de créditos para continuar buscando",
+    creditPackages: "Paquetes disponibles",
+    buy: "Comprar",
+    processing: "Procesando...",
+    paymentSuccess: "¡Pago procesado exitosamente!",
+    creditsAdded: "Los créditos han sido agregados a tu cuenta.",
+    close: "Cerrar",
+    loginRequired: "Debe iniciar sesión para buscar precios",
+    searchTitle: "Buscar precios de boletos de avión",
+    searchDescription: "Ingrese el número de vuelo y compare precios en",
+    countriesGlobal: "países",
+    countriesVerified: "países verificados",
+    searchInProgress: "Buscando...",
+    lowestPrice: "Precio más bajo",
+    bestDeal: "Mejor trato",
+    highestPrice: "Precio más alto",
+    maxDifference: "Diferencia máxima",
+    potentialSavings: "Ahorros potenciales",
+    vsHighest: "vs precio más alto",
+    countriesChecked: "Países verificados",
+    globalComparison: "Comparación global",
+    importantNote: "Nota importante",
+    priceDisclaimer: "Los precios pueden haber cambiado desde la última verificación",
+    priceComparison: "Comparación de precios",
+    priceDescription:
+      'Consulte los precios en diferentes países y elija la mejor oferta. Presione "Reservar ahora" para reservar el boleto.',
+    clickReserve: 'Presione "Reservar ahora" para reservar el boleto.',
+    reserveNow: "Reservar ahora",
+    unofficialSite: "Sitio no oficial",
+    cheapest: "El más barato",
+    vsLowest: "vs precio más bajo",
+    showLess: "Ver menos",
+    showAll: "Ver todos",
+    andMore: "y más",
+    moreCountries: "países",
+    tipsTitle: "Consejos para ahorros máximos",
+    searchToStart: "Ingrese el número de vuelo para comenzar la búsqueda",
+    searchDescription2: "Compare precios en",
+    findBestDeals: "y encuentra las mejores ofertas",
+  },
 }
 
 export default function FlightPriceFinder() {
@@ -839,432 +861,177 @@ export default function FlightPriceFinder() {
               {/* Search History */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <History className="w-5 h-5" />
-                    Istoric căutări ({user.searchHistory.length})
-                  </CardTitle>
-                  <CardDescription>Ultimele 10 căutări efectuate</CardDescription>
+                  <CardTitle className="flex items-center gap-2">{t.searchHistory}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {user.searchHistory.length > 0 ? (
-                    <div className="space-y-3">
-                      {user.searchHistory.map((search) => (
-                        <div
-                          key={search.id}
-                          className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors"
-                        >
-                          <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                              <Plane className="w-5 h-5 text-primary" />
-                            </div>
-                            <div>
-                              <p className="font-medium">{search.flightNumber}</p>
-                              <p className="text-sm text-muted-foreground">
-                                {search.searchDate.toLocaleDateString("ro-RO")} la{" "}
-                                {search.searchDate.toLocaleTimeString("ro-RO", {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                })}
-                              </p>
-                            </div>
+                  {userCredits.searchHistory.length > 0 ? (
+                    <div className="space-y-4">
+                      {userCredits.searchHistory.map((search) => (
+                        <div key={search.id} className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm text-muted-foreground">{t.flightNumber}:</p>
+                            <p className="font-medium">{search.flightNumber}</p>
                           </div>
-                          <div className="text-right">
-                            <p className="font-medium text-green-600">Economii: {search.savings} EUR</p>
-                            <p className="text-sm text-muted-foreground">
-                              {search.lowestPrice} - {search.highestPrice} EUR
-                            </p>
-                            <p className="text-xs text-muted-foreground">{search.countriesChecked} țări</p>
+                          <div>
+                            <p className="text-sm text-muted-foreground">{t.searchDate}:</p>
+                            <p className="font-medium">{search.searchDate.toLocaleDateString()}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-muted-foreground">{t.lowestPrice}:</p>
+                            <p className="font-medium">{search.lowestPrice} EUR</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-muted-foreground">{t.highestPrice}:</p>
+                            <p className="font-medium">{search.highestPrice} EUR</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-muted-foreground">{t.savings}:</p>
+                            <p className="font-medium">{search.savings} EUR</p>
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center py-8">
-                      <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                        <History className="w-8 h-8 text-muted-foreground" />
-                      </div>
-                      <p className="text-muted-foreground">Nu ai efectuat încă nicio căutare</p>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Caută primul tău zbor pentru a vedea istoricul aici
-                      </p>
-                    </div>
+                    <p className="text-sm text-muted-foreground">{t.noSearches}</p>
                   )}
                 </CardContent>
               </Card>
-
-              {/* Quick Actions */}
-              <div className="flex gap-4 pt-4">
-                <Button
-                  onClick={() => {
-                    setShowDashboard(false)
-                    setShowCreditsModal(true)
-                  }}
-                >
-                  <CreditCard className="w-4 h-4" />
-                  Cumpără credite
-                </Button>
-              </div>
             </CardContent>
           </Card>
         </div>
       )}
 
+      {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
-        <Card className="mb-8 glass-card shadow-2xl hover-lift border border-blue-200/50 dark:border-blue-800/50 overflow-hidden">
-          <CardHeader className="pb-6 bg-gradient-to-r from-muted via-background to-muted border-b border-border">
-            <div className="flex items-center gap-6">
-              <div className="w-16 h-16 bg-gradient-to-br from-primary via-accent to-primary rounded-2xl shadow-xl flex items-center justify-center">
-                <Search className="w-8 h-8 text-white" />
-              </div>
-              <div>
-                <CardTitle className="text-3xl font-bold text-primary">{t.searchTitle}</CardTitle>
-                <CardDescription className="text-lg text-muted-foreground mt-2 leading-relaxed">
-                  {t.searchDescription} {countries.length} {t.countriesGlobal}
-                  {user && (
-                    <div className="mt-3 text-sm text-primary font-semibold bg-muted px-3 py-1 rounded-lg inline-block">
-                      💳 Costă 3 credite per căutare
-                    </div>
-                  )}
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="p-8">
-            <form onSubmit={handleSearch} className="space-y-8">
-              <div className="space-y-4">
-                <label className="text-sm font-bold text-primary mb-3 block uppercase tracking-wide">
-                  {t.flightNumber}
-                </label>
-                <div className="relative">
-                  <Input
-                    type="text"
-                    placeholder="ex: LO123, FR456, LH789"
-                    value={flightNumber}
-                    onChange={(e) => setFlightNumber(e.target.value)}
-                    className="h-16 text-xl pl-14 pr-4 border-2 border-border focus:border-primary transition-all duration-300 rounded-2xl shadow-sm bg-input hover:border-accent"
-                  />
-                  <Plane className="absolute left-5 top-1/2 transform -translate-y-1/2 w-6 h-6 text-muted-foreground" />
-                </div>
-              </div>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold">{t.searchTitle}</h2>
+          <Button onClick={() => setShowAllCountries(!showAllCountries)} size="sm">
+            {showAllCountries ? t.showLess : t.showAll}
+          </Button>
+        </div>
 
-              <div className="flex flex-col sm:flex-row gap-6">
-                <Button
-                  type="submit"
-                  disabled={isSearching || !flightNumber.trim()}
-                  className="flex-1 sm:flex-none px-10 h-16 text-xl font-bold bg-gradient-to-r from-primary via-accent to-primary hover:from-accent hover:via-primary hover:to-accent shadow-xl hover-lift transition-all duration-300 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSearching ? (
-                    <>
-                      <Search className="w-6 h-6 mr-3 animate-spin" />
-                      {t.searchInProgress}
-                    </>
-                  ) : (
-                    <>
-                      <Search className="w-6 h-6 mr-3" />
-                      {user ? `Caută (3 credite)` : `${t.searchPrices} ${countries.length} ${t.countries}`}
-                    </>
-                  )}
-                </Button>
+        <form onSubmit={handleSearch} className="mb-8">
+          <Input
+            type="text"
+            placeholder={t.flightNumber}
+            value={flightNumber}
+            onChange={(e) => setFlightNumber(e.target.value)}
+            className="w-full mb-4"
+          />
+          <Button type="submit" className="w-full">
+            {t.searchPrices} {countries.length} {t.countriesGlobal}
+          </Button>
+        </form>
 
-                <div className="flex items-center gap-3 text-sm text-muted-foreground bg-gradient-to-r from-muted to-card px-6 py-4 rounded-2xl relative border border-border">
-                  <Globe className="w-5 h-5 text-primary" />
-                  <span className="font-semibold">
-                    {countries.length} {t.countriesVerified}
-                  </span>
-                  {isSearching && (
-                    <div className="absolute -right-32 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                      <Plane
-                        className={`w-14 h-14 text-primary drop-shadow-xl ${
-                          animationPhase === "takeoff"
-                            ? "animate-airplane-takeoff"
-                            : animationPhase === "landing"
-                              ? "animate-airplane-landing"
-                              : ""
-                        }`}
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-
-        {priceComparisons.length > 0 && (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-              <Card className="glass-card shadow-lg hover-lift card-hover border-primary/20">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">{t.lowestPrice}</p>
-                      <p className="text-2xl font-bold text-primary">
-                        {Math.min(...priceComparisons.map((p) => p.price))} EUR
-                      </p>
-                      <Badge variant="default" className="mt-1 bg-primary/10 text-primary border-primary/20">
-                        <Star className="w-3 h-3 mr-1" />
-                        {t.bestDeal}
-                      </Badge>
-                    </div>
-                    <TrendingDown className="w-8 h-8 text-primary animate-float" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="glass-card shadow-lg hover-lift card-hover border-secondary/20">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">{t.highestPrice}</p>
-                      <p className="text-2xl font-bold text-secondary">
-                        {Math.max(...priceComparisons.map((p) => p.price))} EUR
-                      </p>
-                      <p className="text-xs text-secondary mt-1">{t.maxDifference}</p>
-                    </div>
-                    <Globe className="w-8 h-8 text-secondary animate-float" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="glass-card shadow-lg hover-lift card-hover">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">{t.potentialSavings}</p>
-                      <p className="text-2xl font-bold text-foreground">
-                        {Math.max(...priceComparisons.map((p) => p.price)) -
-                          Math.min(...priceComparisons.map((p) => p.price))}{" "}
-                        EUR
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1">{t.vsHighest}</p>
-                    </div>
-                    <MapPin className="w-8 h-8 text-muted-foreground animate-float" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="glass-card shadow-lg hover-lift card-hover">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">{t.countriesChecked}</p>
-                      <p className="text-2xl font-bold text-foreground">{priceComparisons.length}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{t.globalComparison}</p>
-                    </div>
-                    <Globe className="w-8 h-8 text-muted-foreground animate-float" />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="mb-6 p-4 bg-muted border border-border rounded-lg">
-              <div className="flex items-start gap-3">
-                <div className="w-5 h-5 text-primary mt-0.5">⚠️</div>
-                <div>
-                  <p className="text-sm font-medium text-foreground">{t.importantNote}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{t.priceDisclaimer}</p>
-                </div>
-              </div>
-            </div>
-
-            <Card className="glass-card shadow-xl hover-lift">
-              <CardHeader>
-                <CardTitle className="text-xl">
-                  {t.priceComparison} {flightNumber}
-                </CardTitle>
-                <CardDescription className="text-base">
-                  {t.priceDescription} {countries.length} {t.clickReserve}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {displayedComparisons.map((comparison, index) => (
-                    <div
-                      key={comparison.country}
-                      className={`flex items-center justify-between p-6 rounded-xl border-2 transition-all duration-200 hover:shadow-lg hover-lift ${
-                        index === 0
-                          ? "bg-gradient-to-r from-primary/5 to-primary/10 border-primary shadow-lg animate-pulse-glow"
-                          : "bg-card/50 border-border hover:border-primary/30"
-                      }`}
-                    >
-                      <div className="flex items-center gap-6">
-                        <div className="text-center">
-                          <span className="text-3xl block">{comparison.flag}</span>
-                          {index === 0 && (
-                            <Badge variant="default" className="mt-1 text-xs">
-                              TOP
-                            </Badge>
-                          )}
-                        </div>
-                        <div>
-                          <h3 className="font-bold text-lg text-foreground">{comparison.country}</h3>
-                          <div className="flex items-center gap-4 mt-1">
-                            <p className="text-sm text-muted-foreground flex items-center gap-1">
-                              <Clock className="w-3 h-3" />
-                              {comparison.duration}
-                            </p>
-                            <p className="text-sm text-muted-foreground">{comparison.airline}</p>
-                          </div>
-                          {index === 0 && (
-                            <Badge variant="default" className="mt-2 bg-primary/10 text-primary border-primary/20">
-                              <Star className="w-3 h-3 mr-1" />
-                              {t.cheapest}
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="text-right flex items-center gap-4">
-                        <div>
-                          <p className="text-2xl font-bold text-foreground">
-                            {comparison.price} {comparison.currency}
-                          </p>
-                          {index > 0 && (
-                            <p className="text-sm text-muted-foreground">
-                              +{comparison.price - lowestPrice} EUR {t.vsLowest}
-                            </p>
-                          )}
-                        </div>
-
-                        <div className="flex flex-col gap-2">
-                          {comparison.isOfficial ? (
-                            <Button
-                              asChild
-                              className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 shadow-lg hover-lift transition-all duration-200"
-                            >
-                              <a
-                                href={comparison.bookingUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-2"
-                              >
-                                {t.reserveNow}
-                                <ExternalLink className="w-4 h-4" />
-                              </a>
-                            </Button>
-                          ) : (
-                            <>
-                              <Button disabled className="bg-gray-400 text-gray-600 cursor-not-allowed opacity-50">
-                                {t.unofficialSite}
-                              </Button>
-                              <Button
-                                asChild
-                                size="sm"
-                                variant="outline"
-                                className="text-xs border-primary/30 hover:border-primary hover:bg-primary/5 bg-transparent"
-                              >
-                                <a
-                                  href={comparison.bookingUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="flex items-center gap-1"
-                                >
-                                  Skyscanner
-                                  <ExternalLink className="w-3 h-3" />
-                                </a>
-                              </Button>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-
-                  {priceComparisons.length > 15 && (
-                    <div className="text-center pt-6">
-                      <Button
-                        onClick={() => setShowAllCountries(!showAllCountries)}
-                        variant="outline"
-                        className="flex items-center gap-2 mx-auto"
-                      >
-                        {showAllCountries ? (
-                          <>
-                            <ChevronUp className="w-4 h-4" />
-                            {t.showLess}
-                          </>
-                        ) : (
-                          <>
-                            <ChevronDown className="w-4 h-4" />
-                            {t.showAll} {priceComparisons.length} {t.countriesVerified}
-                          </>
-                        )}
-                      </Button>
-                      {!showAllCountries && (
-                        <p className="text-muted-foreground mt-2">
-                          {t.andMore} {priceComparisons.length - 15} {t.moreCountries}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="mt-8 glass-card shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-                    <span className="text-lg">💡</span>
-                  </div>
-                  {t.tipsTitle}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-3">
-                    <div className="flex items-start gap-3 group hover:translate-x-1 transition-transform duration-200">
-                      <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-primary text-sm font-bold">1</span>
-                      </div>
-                      <p className="text-sm text-black dark:text-white group-hover:text-primary transition-colors duration-200">
-                        {t.tip1}
-                      </p>
-                    </div>
-                    <div className="flex items-start gap-3 group hover:translate-x-1 transition-transform duration-200">
-                      <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-primary text-sm font-bold">2</span>
-                      </div>
-                      <p className="text-sm text-black dark:text-white group-hover:text-primary transition-colors duration-200">
-                        {t.tip2}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex items-start gap-3 group hover:translate-x-1 transition-transform duration-200">
-                      <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-primary text-sm font-bold">3</span>
-                      </div>
-                      <p className="text-sm text-black dark:text-white group-hover:text-primary transition-colors duration-200">
-                        {t.tip3}
-                      </p>
-                    </div>
-                    <div className="flex items-start gap-3 group hover:translate-x-1 transition-transform duration-200">
-                      <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-primary text-sm font-bold">4</span>
-                      </div>
-                      <p className="text-sm text-black dark:text-white group-hover:text-primary transition-colors duration-200">
-                        {t.tip4}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </>
+        {isSearching && (
+          <div className="flex items-center justify-center">
+            <p className="text-lg font-medium">{t.searching}</p>
+          </div>
         )}
 
-        {priceComparisons.length === 0 && !isSearching && (
-          <Card className="text-center py-16 glass-card shadow-xl hover-lift">
-            <CardContent>
-              <div className="w-20 h-20 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse-glow">
-                <Plane className="w-10 h-10 text-white animate-float" />
+        {!isSearching && priceComparisons.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {displayedComparisons.map((comparison) => (
+              <Card key={comparison.country}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <img src={comparison.flag || "/placeholder.svg"} alt={comparison.country} className="w-6 h-6" />
+                    {comparison.country}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground">{t.price}:</p>
+                      <p className="font-medium">{comparison.price} EUR</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">{t.airline}:</p>
+                      <p className="font-medium">{comparison.airline}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground">{t.duration}:</p>
+                      <p className="font-medium">{comparison.duration}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">{t.currency}:</p>
+                      <p className="font-medium">EUR</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Button asChild className="w-full">
+                      <a href={comparison.bookingUrl} target="_blank" rel="noopener noreferrer">
+                        {t.bookNow}
+                      </a>
+                    </Button>
+                    {!comparison.isOfficial && (
+                      <Badge variant="secondary" className="ml-auto">
+                        {t.unofficialSite}
+                      </Badge>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        {!isSearching && priceComparisons.length > 0 && (
+          <div className="mt-8">
+            <p className="text-lg font-medium mb-4">{t.priceDisclaimer}</p>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="text-sm text-muted-foreground">{t.lowestPrice}:</p>
+                <p className="font-medium">{lowestPrice} EUR</p>
               </div>
-              <h3 className="text-xl font-bold text-foreground mb-3">{t.searchToStart}</h3>
-              <p className="text-gray-600 text-center max-w-2xl mx-auto leading-relaxed">
-                {t.searchDescription2} {countries.length} {t.findBestDeals}
-              </p>
-            </CardContent>
-          </Card>
+              <div>
+                <p className="text-sm text-muted-foreground">{t.highestPrice}:</p>
+                <p className="font-medium">{highestPrice} EUR</p>
+              </div>
+            </div>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="text-sm text-muted-foreground">{t.maxDifference}:</p>
+                <p className="font-medium">{maxSavings} EUR</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">{t.potentialSavings}:</p>
+                <p className="font-medium">{t.vsLowest}</p>
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">{t.countriesChecked}:</p>
+                <p className="font-medium">
+                  {priceComparisons.length} {t.countries}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">{t.globalComparison}:</p>
+                <p className="font-medium">{t.vsHighest}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {!isSearching && priceComparisons.length === 0 && (
+          <div className="flex items-center justify-center">
+            <p className="text-lg font-medium">{t.searchToStart}</p>
+          </div>
+        )}
+
+        {!isSearching && priceComparisons.length === 0 && (
+          <div className="mt-8">
+            <h3 className="text-xl font-bold mb-4">{t.tipsTitle}</h3>
+            <ul className="list-disc list-inside space-y-2">
+              <li>{t.tip1}</li>
+              <li>{t.tip2}</li>
+              <li>{t.tip3}</li>
+              <li>{t.tip4}</li>
+            </ul>
+          </div>
         )}
       </main>
     </div>

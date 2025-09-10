@@ -1,13 +1,12 @@
 "use client"
 
 import type React from "react"
-
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Plane, TrendingDown, Wallet, Plus, X, Settings, User, BarChart3 } from "lucide-react"
+import { Plane } from "lucide-react"
 import countries from "@/data/countries" // Importing countries data
 
 interface PriceComparison {
@@ -19,22 +18,6 @@ interface PriceComparison {
   isOfficial: boolean
   bookingUrl: string
   flag: string
-}
-
-interface SearchHistoryItem {
-  id: string
-  flightNumber: string
-  searchDate: Date
-  lowestPrice: number
-  highestPrice: number
-  savings: number
-  countriesChecked: number
-}
-
-interface UserCredits {
-  credits: number
-  searchHistory: SearchHistoryItem[]
-  totalSearches: number
 }
 
 const translations = {
@@ -94,7 +77,6 @@ const translations = {
     countriesChecked: "Țări verificate",
     globalComparison: "Comparație globală",
     importantNote: "Notă importantă",
-    priceDisclaimer: "Prețurile pot suferi modificări de la ultima verificare a datelor",
     priceComparison: "Comparație prețuri",
     priceDescription:
       'Vezi prețurile în diferite țări și alege cea mai bună ofertă. Apasă pe "Rezervă acum" pentru a rezerva biletul.',
@@ -168,7 +150,6 @@ const translations = {
     countriesChecked: "Countries checked",
     globalComparison: "Global comparison",
     importantNote: "Important note",
-    priceDisclaimer: "Prices may have changed since last data verification",
     priceComparison: "Price comparison",
     priceDescription:
       'See prices in different countries and choose the best offer. Press "Book now" to book the ticket.',
@@ -242,7 +223,6 @@ const translations = {
     countriesChecked: "Pays vérifiés",
     globalComparison: "Comparaison globale",
     importantNote: "Note importante",
-    priceDisclaimer: "Les prix peuvent avoir changé depuis la dernière vérification",
     priceComparison: "Comparaison des prix",
     priceDescription:
       'Consultez les prix dans différents pays et choisissez la meilleure offre. Appuyez sur "Réserver maintenant" pour réserver le billet.',
@@ -316,7 +296,6 @@ const translations = {
     countriesChecked: "Países verificados",
     globalComparison: "Comparación global",
     importantNote: "Nota importante",
-    priceDisclaimer: "Los precios pueden haber cambiado desde la última verificación",
     priceComparison: "Comparación de precios",
     priceDescription:
       'Consulte los precios en diferentes países y elija la mejor oferta. Presione "Reservar ahora" para reservar el boleto.',
@@ -336,24 +315,249 @@ const translations = {
   },
 }
 
-const handleBuyCredits = (credits: number, cost: number) => {
-  // Placeholder function for handling credit purchase logic
-  console.log(`Purchased ${credits} credits for ${cost} EUR`)
+const searchPrices = async (
+  flightNumber: string,
+  setIsSearching: React.Dispatch<React.SetStateAction<boolean>>,
+  setShowAnimation: React.Dispatch<React.SetStateAction<boolean>>,
+  setPriceComparisons: React.Dispatch<React.SetStateAction<PriceComparison[]>>,
+  setAnimationPhase: React.Dispatch<React.SetStateAction<"idle" | "takeoff" | "landing">>,
+) => {
+  if (!flightNumber.trim()) return
+
+  setIsSearching(true)
+  setShowAnimation(true)
+
+  const generatePriceVariation = (basePrice: number, flightNumber: string, countryIndex: number) => {
+    const flightHash = flightNumber.split("").reduce((a, b) => {
+      a = (a << 5) - a + b.charCodeAt(0)
+      return a & a
+    }, 0)
+
+    const countryHash = countryIndex * 17 + (Math.abs(flightHash) % 100)
+
+    const variation = (countryHash % 100) - 40
+    const finalPrice = Math.round(basePrice * (1 + variation / 100))
+
+    return Math.max(finalPrice, 80)
+  }
+
+  const getAirlineFromFlightCode = (flightNumber: string) => {
+    const code = flightNumber.replace(/[0-9]/g, "").toUpperCase()
+
+    const airlineMap: { [key: string]: { airline: string; website: string; isOfficial: boolean } } = {
+      // Major European Airlines
+      BA: { airline: "British Airways", website: "https://www.britishairways.com", isOfficial: true },
+      LH: { airline: "Lufthansa", website: "https://www.lufthansa.com", isOfficial: true },
+      AF: { airline: "Air France", website: "https://www.airfrance.com", isOfficial: true },
+      KL: { airline: "KLM", website: "https://www.klm.com", isOfficial: true },
+      IB: { airline: "Iberia", website: "https://www.iberia.com", isOfficial: true },
+      AZ: { airline: "ITA Airways", website: "https://www.itaspa.com", isOfficial: true },
+      LX: { airline: "Swiss International", website: "https://www.swiss.com", isOfficial: true },
+      OS: { airline: "Austrian Airlines", website: "https://www.austrian.com", isOfficial: true },
+      SN: { airline: "Brussels Airlines", website: "https://www.brusselsairlines.com", isOfficial: true },
+      SK: { airline: "SAS", website: "https://www.flysas.com", isOfficial: true },
+      AY: { airline: "Finnair", website: "https://www.finnair.com", isOfficial: true },
+      DY: { airline: "Norwegian", website: "https://www.norwegian.com", isOfficial: true },
+
+      // Eastern European Airlines
+      LO: { airline: "LOT Polish Airlines", website: "https://www.lot.com", isOfficial: true },
+      RO: { airline: "TAROM", website: "https://www.tarom.ro", isOfficial: true },
+      OK: { airline: "Czech Airlines", website: "https://www.czechairlines.com", isOfficial: true },
+      JU: { airline: "Air Serbia", website: "https://www.airserbia.com", isOfficial: true },
+      OU: { airline: "Croatia Airlines", website: "https://www.croatiaairlines.com", isOfficial: true },
+      W6: { airline: "Wizz Air", website: "https://wizzair.com", isOfficial: true },
+      FR: { airline: "Ryanair", website: "https://www.ryanair.com", isOfficial: true },
+
+      // North American Airlines
+      AA: { airline: "American Airlines", website: "https://www.aa.com", isOfficial: true },
+      UA: { airline: "United Airlines", website: "https://www.united.com", isOfficial: true },
+      DL: { airline: "Delta Air Lines", website: "https://www.delta.com", isOfficial: true },
+      AC: { airline: "Air Canada", website: "https://www.aircanada.com", isOfficial: true },
+      WN: { airline: "Southwest Airlines", website: "https://www.southwest.com", isOfficial: true },
+      B6: { airline: "JetBlue Airways", website: "https://www.jetblue.com", isOfficial: true },
+      AS: { airline: "Alaska Airlines", website: "https://www.alaskaair.com", isOfficial: true },
+      F9: { airline: "Frontier Airlines", website: "https://www.flyfrontier.com", isOfficial: true },
+      NK: { airline: "Spirit Airlines", website: "https://www.spirit.com", isOfficial: true },
+      WS: { airline: "WestJet", website: "https://www.westjet.com", isOfficial: true },
+      Y4: { airline: "Volaris", website: "https://www.volaris.com", isOfficial: true },
+      VB: { airline: "VivaAerobus", website: "https://www.vivaaerobus.com", isOfficial: true },
+      AM: { airline: "Aeromexico", website: "https://aeromexico.com", isOfficial: true },
+
+      // Middle East Airlines
+      EK: { airline: "Emirates", website: "https://www.emirates.com", isOfficial: true },
+      QR: { airline: "Qatar Airways", website: "https://www.qatarairways.com", isOfficial: true },
+      TK: { airline: "Turkish Airlines", website: "https://www.turkishairlines.com", isOfficial: true },
+      FZ: { airline: "flydubai", website: "https://www.flydubai.com", isOfficial: true },
+      WY: { airline: "Oman Air", website: "https://www.omanair.com", isOfficial: true },
+      GF: { airline: "Gulf Air", website: "https://www.gulfair.com", isOfficial: true },
+      ME: { airline: "Middle East Airlines", website: "https://www.mea.com.lb", isOfficial: true },
+      RJ: { airline: "Royal Jordanian", website: "https://www.rj.com", isOfficial: true },
+      SV: { airline: "Saudia", website: "https://www.saudia.com", isOfficial: true },
+      LY: { airline: "El Al", website: "https://www.elal.com", isOfficial: true },
+
+      // Asian Airlines
+      SQ: { airline: "Singapore Airlines", website: "https://www.singaporeair.com", isOfficial: true },
+      JL: { airline: "Japan Airlines", website: "https://www.jal.co.jp/en/us", isOfficial: true },
+      NH: { airline: "ANA", website: "https://www.ana.co.jp/en/us", isOfficial: true },
+      CX: { airline: "Cathay Pacific", website: "https://www.cathaypacific.com", isOfficial: true },
+      AI: { airline: "Air India", website: "https://www.airindia.in", isOfficial: true },
+      TG: { airline: "Thai Airways", website: "https://www.thaiairways.com", isOfficial: true },
+      MH: { airline: "Malaysia Airlines", website: "https://www.malaysiaairlines.com", isOfficial: true },
+      GA: { airline: "Garuda Indonesia", website: "https://www.garuda-indonesia.com", isOfficial: true },
+      PR: { airline: "Philippine Airlines", website: "https://www.philippineairlines.com", isOfficial: true },
+      VN: { airline: "Vietnam Airlines", website: "https://www.vietnamairlines.com", isOfficial: true },
+      KE: { airline: "Korean Air", website: "https://www.koreanair.com", isOfficial: true },
+      OZ: { airline: "Asiana Airlines", website: "https://flyasiana.com", isOfficial: true },
+      CI: { airline: "China Airlines", website: "https://www.china-airlines.com", isOfficial: true },
+      BR: { airline: "EVA Air", website: "https://www.evaair.com", isOfficial: true },
+      CA: { airline: "Air China", website: "https://www.airchina.com.cn", isOfficial: true },
+      CZ: { airline: "China Southern", website: "https://www.csair.com", isOfficial: true },
+      MU: { airline: "China Eastern", website: "https://www.ceair.com", isOfficial: true },
+      HU: { airline: "Hainan Airlines", website: "https://www.hainanairlines.com", isOfficial: true },
+      "9W": { airline: "Jet Airways", website: "https://www.jetairways.com", isOfficial: false },
+      "6E": { airline: "IndiGo", website: "https://www.goindigo.in", isOfficial: true },
+      SG: { airline: "SpiceJet", website: "https://www.spicejet.com", isOfficial: true },
+
+      // Low-Cost Carriers Globally
+      U2: { airline: "easyJet", website: "https://www.easyjet.com", isOfficial: true },
+      VY: { airline: "Vueling", website: "https://www.vueling.com", isOfficial: true },
+      TP: { airline: "TAP Air Portugal", website: "https://www.flytap.com", isOfficial: true },
+      HV: { airline: "Transavia", website: "https://www.transavia.com", isOfficial: true },
+      PC: { airline: "Pegasus Airlines", website: "https://www.flypgs.com", isOfficial: true },
+      XQ: { airline: "SunExpress", website: "https://www.sunexpress.com", isOfficial: true },
+      A3: { airline: "Aegean Airlines", website: "https://www.aegeanair.com", isOfficial: true },
+      EI: { airline: "Aer Lingus", website: "https://www.aerlingus.com", isOfficial: true },
+      KM: { airline: "Air Malta", website: "https://www.airmalta.com", isOfficial: true },
+      CY: { airline: "Cyprus Airways", website: "https://www.cyprusairways.com", isOfficial: true },
+      BT: { airline: "airBaltic", website: "https://www.airbaltic.com", isOfficial: true },
+      WF: { airline: "Widerøe", website: "https://www.wideroe.no", isOfficial: true },
+    }
+
+    if (airlineMap[code]) {
+      return airlineMap[code]
+    } else {
+      return {
+        airline: `${code} Airlines`,
+        website: `https://www.skyscanner.com/transport/flights/${flightNumber.toLowerCase()}/`,
+        isOfficial: false,
+      }
+    }
+  }
+
+  const basePrices = {
+    România: 185,
+    Bulgaria: 190,
+    Serbia: 175,
+    Macedonia: 170,
+    Albania: 165,
+    Bosnia: 168,
+    Polonia: 195,
+    Ungaria: 192,
+    Cehia: 198,
+    Slovacia: 200,
+    Slovenia: 215,
+    Croația: 210,
+    Austria: 240,
+    Germania: 255,
+    Franța: 265,
+    Belgia: 260,
+    Olanda: 270,
+    Italia: 245,
+    Spania: 235,
+    Portugalia: 230,
+    Danemarca: 305,
+    Suedia: 300,
+    Norvegia: 340,
+    Finlanda: 310,
+    Elveția: 330,
+    Islanda: 350,
+    Luxemburg: 280,
+    Monaco: 320,
+    SUA: 450,
+    Canada: 410,
+    Japonia: 680,
+    Australia: 820,
+    Brazilia: 550,
+    "Emiratele Arabe": 370,
+    Singapore: 610,
+    Thailanda: 480,
+    India: 410,
+    China: 510,
+    "Coreea de Sud": 650,
+    Mexic: 490,
+    Argentina: 610,
+    "Africa de Sud": 550,
+    "Noua Zeelandă": 880,
+    Israel: 310,
+    Turcia: 215,
+    Egipt: 350,
+    "Arabia Saudită": 390,
+    Malaezia: 550,
+    Indonezia: 570,
+    Filipine: 590,
+    Vietnam: 510,
+    Grecia: 220,
+    Irlanda: 280,
+    Malta: 250,
+    Cipru: 260,
+    Estonia: 205,
+    Letonia: 210,
+    Lituania: 208,
+    "Hong Kong": 620,
+    Taiwan: 600,
+    Maroc: 280,
+    Kenya: 480,
+    Nigeria: 520,
+    Qatar: 380,
+    Kuwait: 400,
+    Chile: 640,
+    Peru: 580,
+    Columbia: 560,
+  }
+
+  const mockData: PriceComparison[] = countries.map((country, index) => {
+    const basePrice = basePrices[country.name as keyof typeof basePrices] || 250
+    const price = generatePriceVariation(basePrice, flightNumber, index)
+    const airlineInfo = getAirlineFromFlightCode(flightNumber)
+
+    return {
+      country: country.name,
+      flag: country.flag,
+      price: price,
+      currency: "EUR",
+      bookingUrl: airlineInfo.website,
+      airline: airlineInfo.airline,
+      duration: price > 500 ? "8h+" : price > 350 ? "4h+" : "2h 15m",
+      isOfficial: airlineInfo.isOfficial,
+    }
+  })
+
+  const sortedData = mockData.sort((a, b) => a.price - b.price)
+  setPriceComparisons(sortedData)
+
+  setAnimationPhase("landing")
+
+  setTimeout(() => {
+    setAnimationPhase("idle")
+    setIsSearching(false)
+  }, 1000)
+}
+
+const handleSearch = (
+  e: React.FormEvent,
+  flightNumber: string,
+  setIsSearching: React.Dispatch<React.SetStateAction<boolean>>,
+  setShowAnimation: React.Dispatch<React.SetStateAction<boolean>>,
+  setPriceComparisons: React.Dispatch<React.SetStateAction<PriceComparison[]>>,
+  setAnimationPhase: React.Dispatch<React.SetStateAction<"idle" | "takeoff" | "landing">>,
+) => {
+  e.preventDefault()
+  if (flightNumber.trim()) {
+    searchPrices(flightNumber, setIsSearching, setShowAnimation, setPriceComparisons, setAnimationPhase)
+  }
 }
 
 export default function FlightPriceFinder() {
-  const [userCredits, setUserCredits] = useState<UserCredits>(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("userCredits")
-      return saved ? JSON.parse(saved) : { credits: 0, searchHistory: [], totalSearches: 0 }
-    }
-    return { credits: 0, searchHistory: [], totalSearches: 0 }
-  })
-  const [showCreditsModal, setShowCreditsModal] = useState(false)
-  const [showDashboard, setShowDashboard] = useState(false)
-  const [isProcessingPayment, setIsProcessingPayment] = useState(false)
-  const [paymentSuccess, setPaymentSuccess] = useState(false)
-  const [showUserMenu, setShowUserMenu] = useState(false)
   const [flightNumber, setFlightNumber] = useState("")
   const [isSearching, setIsSearching] = useState(false)
   const [priceComparisons, setPriceComparisons] = useState<PriceComparison[]>([])
@@ -363,266 +567,7 @@ export default function FlightPriceFinder() {
   const [showLanguageMenu, setShowLanguageMenu] = useState(false)
   const [showAnimation, setShowAnimation] = useState(false)
 
-  useEffect(() => {
-    localStorage.setItem("userCredits", JSON.stringify(userCredits))
-  }, [userCredits])
-
-  const updateUserCredits = (newCredits: Partial<UserCredits>) => {
-    setUserCredits((prev) => ({ ...prev, ...newCredits }))
-  }
-
   const t = translations[language]
-
-  const searchPrices = async () => {
-    if (userCredits.credits < 3) {
-      setShowCreditsModal(true)
-      return
-    }
-
-    setIsSearching(true)
-    setShowAnimation(true)
-
-    updateUserCredits({ credits: userCredits.credits - 3 })
-
-    const generatePriceVariation = (basePrice: number, flightNumber: string, countryIndex: number) => {
-      const flightHash = flightNumber.split("").reduce((a, b) => {
-        a = (a << 5) - a + b.charCodeAt(0)
-        return a & a
-      }, 0)
-
-      const countryHash = countryIndex * 17 + (Math.abs(flightHash) % 100)
-
-      const variation = (countryHash % 100) - 40
-      const finalPrice = Math.round(basePrice * (1 + variation / 100))
-
-      return Math.max(finalPrice, 80)
-    }
-
-    const getAirlineFromFlightCode = (flightNumber: string) => {
-      const code = flightNumber.replace(/[0-9]/g, "").toUpperCase()
-
-      const airlineMap: { [key: string]: { airline: string; website: string; isOfficial: boolean } } = {
-        // Major European Airlines
-        BA: { airline: "British Airways", website: "https://www.britishairways.com", isOfficial: true },
-        LH: { airline: "Lufthansa", website: "https://www.lufthansa.com", isOfficial: true },
-        AF: { airline: "Air France", website: "https://www.airfrance.com", isOfficial: true },
-        KL: { airline: "KLM", website: "https://www.klm.com", isOfficial: true },
-        IB: { airline: "Iberia", website: "https://www.iberia.com", isOfficial: true },
-        AZ: { airline: "ITA Airways", website: "https://www.itaspa.com", isOfficial: true },
-        LX: { airline: "Swiss International", website: "https://www.swiss.com", isOfficial: true },
-        OS: { airline: "Austrian Airlines", website: "https://www.austrian.com", isOfficial: true },
-        SN: { airline: "Brussels Airlines", website: "https://www.brusselsairlines.com", isOfficial: true },
-        SK: { airline: "SAS", website: "https://www.flysas.com", isOfficial: true },
-        AY: { airline: "Finnair", website: "https://www.finnair.com", isOfficial: true },
-        DY: { airline: "Norwegian", website: "https://www.norwegian.com", isOfficial: true },
-
-        // Eastern European Airlines
-        LO: { airline: "LOT Polish Airlines", website: "https://www.lot.com", isOfficial: true },
-        RO: { airline: "TAROM", website: "https://www.tarom.ro", isOfficial: true },
-        OK: { airline: "Czech Airlines", website: "https://www.czechairlines.com", isOfficial: true },
-        JU: { airline: "Air Serbia", website: "https://www.airserbia.com", isOfficial: true },
-        OU: { airline: "Croatia Airlines", website: "https://www.croatiaairlines.com", isOfficial: true },
-        W6: { airline: "Wizz Air", website: "https://wizzair.com", isOfficial: true },
-        FR: { airline: "Ryanair", website: "https://www.ryanair.com", isOfficial: true },
-
-        // North American Airlines
-        AA: { airline: "American Airlines", website: "https://www.aa.com", isOfficial: true },
-        UA: { airline: "United Airlines", website: "https://www.united.com", isOfficial: true },
-        DL: { airline: "Delta Air Lines", website: "https://www.delta.com", isOfficial: true },
-        AC: { airline: "Air Canada", website: "https://www.aircanada.com", isOfficial: true },
-        WN: { airline: "Southwest Airlines", website: "https://www.southwest.com", isOfficial: true },
-        B6: { airline: "JetBlue Airways", website: "https://www.jetblue.com", isOfficial: true },
-        AS: { airline: "Alaska Airlines", website: "https://www.alaskaair.com", isOfficial: true },
-        F9: { airline: "Frontier Airlines", website: "https://www.flyfrontier.com", isOfficial: true },
-        NK: { airline: "Spirit Airlines", website: "https://www.spirit.com", isOfficial: true },
-        WS: { airline: "WestJet", website: "https://www.westjet.com", isOfficial: true },
-        Y4: { airline: "Volaris", website: "https://www.volaris.com", isOfficial: true },
-        VB: { airline: "VivaAerobus", website: "https://www.vivaaerobus.com", isOfficial: true },
-        AM: { airline: "Aeromexico", website: "https://aeromexico.com", isOfficial: true },
-
-        // Middle East Airlines
-        EK: { airline: "Emirates", website: "https://www.emirates.com", isOfficial: true },
-        QR: { airline: "Qatar Airways", website: "https://www.qatarairways.com", isOfficial: true },
-        TK: { airline: "Turkish Airlines", website: "https://www.turkishairlines.com", isOfficial: true },
-        FZ: { airline: "flydubai", website: "https://www.flydubai.com", isOfficial: true },
-        WY: { airline: "Oman Air", website: "https://www.omanair.com", isOfficial: true },
-        GF: { airline: "Gulf Air", website: "https://www.gulfair.com", isOfficial: true },
-        ME: { airline: "Middle East Airlines", website: "https://www.mea.com.lb", isOfficial: true },
-        RJ: { airline: "Royal Jordanian", website: "https://www.rj.com", isOfficial: true },
-        SV: { airline: "Saudia", website: "https://www.saudia.com", isOfficial: true },
-        LY: { airline: "El Al", website: "https://www.elal.com", isOfficial: true },
-
-        // Asian Airlines
-        SQ: { airline: "Singapore Airlines", website: "https://www.singaporeair.com", isOfficial: true },
-        JL: { airline: "Japan Airlines", website: "https://www.jal.co.jp/en/us", isOfficial: true },
-        NH: { airline: "ANA", website: "https://www.ana.co.jp/en/us", isOfficial: true },
-        CX: { airline: "Cathay Pacific", website: "https://www.cathaypacific.com", isOfficial: true },
-        AI: { airline: "Air India", website: "https://www.airindia.in", isOfficial: true },
-        TG: { airline: "Thai Airways", website: "https://www.thaiairways.com", isOfficial: true },
-        MH: { airline: "Malaysia Airlines", website: "https://www.malaysiaairlines.com", isOfficial: true },
-        GA: { airline: "Garuda Indonesia", website: "https://www.garuda-indonesia.com", isOfficial: true },
-        PR: { airline: "Philippine Airlines", website: "https://www.philippineairlines.com", isOfficial: true },
-        VN: { airline: "Vietnam Airlines", website: "https://www.vietnamairlines.com", isOfficial: true },
-        KE: { airline: "Korean Air", website: "https://www.koreanair.com", isOfficial: true },
-        OZ: { airline: "Asiana Airlines", website: "https://flyasiana.com", isOfficial: true },
-        CI: { airline: "China Airlines", website: "https://www.china-airlines.com", isOfficial: true },
-        BR: { airline: "EVA Air", website: "https://www.evaair.com", isOfficial: true },
-        CA: { airline: "Air China", website: "https://www.airchina.com.cn", isOfficial: true },
-        CZ: { airline: "China Southern", website: "https://www.csair.com", isOfficial: true },
-        MU: { airline: "China Eastern", website: "https://www.ceair.com", isOfficial: true },
-        HU: { airline: "Hainan Airlines", website: "https://www.hainanairlines.com", isOfficial: true },
-        "9W": { airline: "Jet Airways", website: "https://www.jetairways.com", isOfficial: false },
-        "6E": { airline: "IndiGo", website: "https://www.goindigo.in", isOfficial: true },
-        SG: { airline: "SpiceJet", website: "https://www.spicejet.com", isOfficial: true },
-
-        // Low-Cost Carriers Globally
-        U2: { airline: "easyJet", website: "https://www.easyjet.com", isOfficial: true },
-        VY: { airline: "Vueling", website: "https://www.vueling.com", isOfficial: true },
-        TP: { airline: "TAP Air Portugal", website: "https://www.flytap.com", isOfficial: true },
-        HV: { airline: "Transavia", website: "https://www.transavia.com", isOfficial: true },
-        PC: { airline: "Pegasus Airlines", website: "https://www.flypgs.com", isOfficial: true },
-        XQ: { airline: "SunExpress", website: "https://www.sunexpress.com", isOfficial: true },
-        A3: { airline: "Aegean Airlines", website: "https://www.aegeanair.com", isOfficial: true },
-        EI: { airline: "Aer Lingus", website: "https://www.aerlingus.com", isOfficial: true },
-        KM: { airline: "Air Malta", website: "https://www.airmalta.com", isOfficial: true },
-        CY: { airline: "Cyprus Airways", website: "https://www.cyprusairways.com", isOfficial: true },
-        BT: { airline: "airBaltic", website: "https://www.airbaltic.com", isOfficial: true },
-        WF: { airline: "Widerøe", website: "https://www.wideroe.no", isOfficial: true },
-      }
-
-      if (airlineMap[code]) {
-        return airlineMap[code]
-      } else {
-        return {
-          airline: `${code} Airlines`,
-          website: `https://www.skyscanner.com/transport/flights/${flightNumber.toLowerCase()}/`,
-          isOfficial: false,
-        }
-      }
-    }
-
-    const basePrices = {
-      România: 185,
-      Bulgaria: 190,
-      Serbia: 175,
-      Macedonia: 170,
-      Albania: 165,
-      Bosnia: 168,
-      Polonia: 195,
-      Ungaria: 192,
-      Cehia: 198,
-      Slovacia: 200,
-      Slovenia: 215,
-      Croația: 210,
-      Austria: 240,
-      Germania: 255,
-      Franța: 265,
-      Belgia: 260,
-      Olanda: 270,
-      Italia: 245,
-      Spania: 235,
-      Portugalia: 230,
-      Danemarca: 305,
-      Suedia: 300,
-      Norvegia: 340,
-      Finlanda: 310,
-      Elveția: 330,
-      Islanda: 350,
-      Luxemburg: 280,
-      Monaco: 320,
-      SUA: 450,
-      Canada: 410,
-      Japonia: 680,
-      Australia: 820,
-      Brazilia: 550,
-      "Emiratele Arabe": 370,
-      Singapore: 610,
-      Thailanda: 480,
-      India: 410,
-      China: 510,
-      "Coreea de Sud": 650,
-      Mexic: 490,
-      Argentina: 610,
-      "Africa de Sud": 550,
-      "Noua Zeelandă": 880,
-      Israel: 310,
-      Turcia: 215,
-      Egipt: 350,
-      "Arabia Saudită": 390,
-      Malaezia: 550,
-      Indonezia: 570,
-      Filipine: 590,
-      Vietnam: 510,
-      Grecia: 220,
-      Irlanda: 280,
-      Malta: 250,
-      Cipru: 260,
-      Estonia: 205,
-      Letonia: 210,
-      Lituania: 208,
-      "Hong Kong": 620,
-      Taiwan: 600,
-      Maroc: 280,
-      Kenya: 480,
-      Nigeria: 520,
-      Qatar: 380,
-      Kuwait: 400,
-      Chile: 640,
-      Peru: 580,
-      Columbia: 560,
-    }
-
-    const mockData: PriceComparison[] = countries.map((country, index) => {
-      const basePrice = basePrices[country.name as keyof typeof basePrices] || 250
-      const price = generatePriceVariation(basePrice, flightNumber, index)
-      const airlineInfo = getAirlineFromFlightCode(flightNumber)
-
-      return {
-        country: country.name,
-        flag: country.flag,
-        price: price,
-        currency: "EUR",
-        bookingUrl: airlineInfo.website,
-        airline: airlineInfo.airline,
-        duration: price > 500 ? "8h+" : price > 350 ? "4h+" : "2h 15m",
-        isOfficial: airlineInfo.isOfficial,
-      }
-    })
-
-    const sortedData = mockData.sort((a, b) => a.price - b.price)
-    setPriceComparisons(sortedData)
-
-    const lowestPrice = Math.min(...sortedData.map((p) => p.price))
-    const highestPrice = Math.max(...sortedData.map((p) => p.price))
-    const newSearchHistory: SearchHistoryItem = {
-      id: Math.random().toString(36).substr(2, 9),
-      flightNumber: flightNumber,
-      searchDate: new Date(),
-      lowestPrice: lowestPrice,
-      highestPrice: highestPrice,
-      savings: highestPrice - lowestPrice,
-      countriesChecked: sortedData.length,
-    }
-
-    await updateUserCredits({
-      searchHistory: [newSearchHistory, ...userCredits.searchHistory].slice(0, 10),
-      totalSearches: userCredits.totalSearches + 1,
-    })
-
-    setAnimationPhase("landing")
-
-    setTimeout(() => {
-      setAnimationPhase("idle")
-      setIsSearching(false)
-    }, 1000)
-  }
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (flightNumber.trim()) {
-      searchPrices()
-    }
-  }
 
   const lowestPrice = priceComparisons.length > 0 ? Math.min(...priceComparisons.map((p) => p.price)) : 0
   const highestPrice = priceComparisons.length > 0 ? Math.max(...priceComparisons.map((p) => p.price)) : 0
@@ -653,36 +598,17 @@ export default function FlightPriceFinder() {
           <div className="flex items-center gap-4">
             {/* Language Selector */}
             <div className="relative">
-              <select
-                value={language}
-                onChange={(e) => setLanguage(e.target.value as "ro" | "en" | "fr" | "es")}
-                className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer hover:border-blue-300 dark:hover:border-blue-600 transition-colors"
+              <button
+                onClick={() => setShowLanguageMenu(!showLanguageMenu)}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-card border border-border hover:bg-muted transition-colors"
               >
-                <option value="ro">🇷🇴 RO</option>
-                <option value="en">🇬🇧 EN</option>
-                <option value="fr">🇫🇷 FR</option>
-                <option value="es">🇪🇸 ES</option>
-              </select>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <div
-                className="flex items-center gap-2 bg-gradient-to-r from-muted to-card px-4 py-2 rounded-xl cursor-pointer hover:from-card hover:to-muted transition-all duration-200 border border-border"
-                onClick={() => setShowCreditsModal(true)}
-              >
-                <Wallet className="w-4 h-4 text-primary" />
-                <span className="text-sm font-bold text-primary">{userCredits.credits} credite</span>
-              </div>
-
-              <Button
-                onClick={() => setShowDashboard(true)}
-                size="sm"
-                variant="ghost"
-                className="flex items-center gap-2 px-3 py-2 h-auto hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl"
-              >
-                <Settings className="w-4 h-4" />
-                <span className="text-sm">Dashboard</span>
-              </Button>
+                <span className="text-lg">
+                  {language === "ro" && "🇷🇴"}
+                  {language === "en" && "🇺🇸"}
+                  {language === "fr" && "🇫🇷"}
+                  {language === "es" && "🇪🇸"}
+                </span>
+              </button>
             </div>
           </div>
         </div>
@@ -693,7 +619,12 @@ export default function FlightPriceFinder() {
         {/* Search Section */}
         <section className="mb-8">
           <h2 className="text-2xl font-bold mb-4">{t.searchTitle}</h2>
-          <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
+          <form
+            onSubmit={(e) =>
+              handleSearch(e, flightNumber, setIsSearching, setShowAnimation, setPriceComparisons, setAnimationPhase)
+            }
+            className="flex flex-col md:flex-row gap-4"
+          >
             <Input
               type="text"
               placeholder={t.flightNumber}
@@ -781,18 +712,10 @@ export default function FlightPriceFinder() {
                     <p className="font-medium">{maxSavings} EUR</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">{t.potentialSavings}:</p>
-                    <p className="font-medium">{t.vsLowest}</p>
-                  </div>
-                  <div>
                     <p className="text-sm text-muted-foreground">{t.countriesChecked}:</p>
                     <p className="font-medium">
                       {priceComparisons.length} {t.countries}
                     </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">{t.globalComparison}:</p>
-                    <p className="font-medium">{t.vsHighest}</p>
                   </div>
                 </div>
                 <Button onClick={() => setShowAllCountries(!showAllCountries)} size="sm">
@@ -821,236 +744,6 @@ export default function FlightPriceFinder() {
           )}
         </section>
       </main>
-
-      {/* Dashboard Modal */}
-      {showDashboard && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <Settings className="w-5 h-5" />
-                  Dashboard utilizator
-                </CardTitle>
-                <Button onClick={() => setShowDashboard(false)} size="sm" variant="ghost">
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-              <CardDescription>Gestionează contul și vezi statisticile căutărilor tale</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Account Overview */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card
-                  className="cursor-pointer hover:shadow-md transition-shadow"
-                  onClick={() => setShowCreditsModal(true)}
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                        <Wallet className="w-5 h-5 text-primary" />
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Credite disponibile</p>
-                        <p className="text-2xl font-bold text-primary">{userCredits.credits}</p>
-                      </div>
-                      <div className="ml-auto">
-                        <Button size="sm" variant="outline">
-                          <Plus className="w-3 h-3 mr-1" />
-                          Cumpără
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-secondary/5 border-secondary/20">
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-secondary/10 rounded-lg flex items-center justify-center">
-                        <BarChart3 className="w-5 h-5 text-secondary" />
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Total căutări</p>
-                        <p className="text-2xl font-bold text-secondary">{userCredits.totalSearches}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-green-50 border-green-200">
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                        <TrendingDown className="w-5 h-5 text-green-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Economii totale</p>
-                        <p className="text-2xl font-bold text-green-600">
-                          {userCredits.searchHistory.reduce((total, search) => total + search.savings, 0)} EUR
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="w-5 h-5" />
-                    Informații cont
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Credite:</span>
-                    <span className="font-medium">{userCredits.credits}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Căutări efectuate:</span>
-                    <span className="font-medium">{userCredits.totalSearches}</span>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Search History */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">{t.searchHistory}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {userCredits.searchHistory.length > 0 ? (
-                    <div className="space-y-4">
-                      {userCredits.searchHistory.map((search) => (
-                        <div key={search.id} className="flex items-center justify-between">
-                          <div>
-                            <p className="text-sm text-muted-foreground">{t.flightNumber}:</p>
-                            <p className="font-medium">{search.flightNumber}</p>
-                          </div>
-                          <div>
-                            <p className="text-sm text-muted-foreground">{t.searchDate}:</p>
-                            <p className="font-medium">{search.searchDate.toLocaleDateString()}</p>
-                          </div>
-                          <div>
-                            <p className="text-sm text-muted-foreground">{t.lowestPrice}:</p>
-                            <p className="font-medium">{search.lowestPrice} EUR</p>
-                          </div>
-                          <div>
-                            <p className="text-sm text-muted-foreground">{t.highestPrice}:</p>
-                            <p className="font-medium">{search.highestPrice} EUR</p>
-                          </div>
-                          <div>
-                            <p className="text-sm text-muted-foreground">{t.savings}:</p>
-                            <p className="font-medium">{search.savings} EUR</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">{t.noSearches}</p>
-                  )}
-                </CardContent>
-              </Card>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* Buy Credits Modal */}
-      {showCreditsModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="w-full max-w-md">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>{t.buyCreditsTitle}</CardTitle>
-                <Button onClick={() => setShowCreditsModal(false)} size="sm" variant="ghost">
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-              <CardDescription>{t.buyCreditsDesc}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <h3 className="text-lg font-semibold">{t.creditPackages}</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Example Credit Packages */}
-                <Card className="cursor-pointer hover:shadow-md transition-shadow">
-                  <CardContent className="p-4">
-                    <p className="text-xl font-bold">10 Credits</p>
-                    <p className="text-sm text-muted-foreground">5 EUR</p>
-                    <Button
-                      onClick={() => handleBuyCredits(10, 5)}
-                      className="w-full mt-4"
-                      disabled={isProcessingPayment}
-                    >
-                      {isProcessingPayment ? t.processing : t.buy}
-                    </Button>
-                  </CardContent>
-                </Card>
-
-                <Card className="cursor-pointer hover:shadow-md transition-shadow">
-                  <CardContent className="p-4">
-                    <p className="text-xl font-bold">25 Credits</p>
-                    <p className="text-sm text-muted-foreground">12 EUR</p>
-                    <Button
-                      onClick={() => handleBuyCredits(25, 12)}
-                      className="w-full mt-4"
-                      disabled={isProcessingPayment}
-                    >
-                      {isProcessingPayment ? t.processing : t.buy}
-                    </Button>
-                  </CardContent>
-                </Card>
-
-                <Card className="cursor-pointer hover:shadow-md transition-shadow">
-                  <CardContent className="p-4">
-                    <p className="text-xl font-bold">50 Credits</p>
-                    <p className="text-sm text-muted-foreground">23 EUR</p>
-                    <Button
-                      onClick={() => handleBuyCredits(50, 23)}
-                      className="w-full mt-4"
-                      disabled={isProcessingPayment}
-                    >
-                      {isProcessingPayment ? t.processing : t.buy}
-                    </Button>
-                  </CardContent>
-                </Card>
-
-                <Card className="cursor-pointer hover:shadow-md transition-shadow">
-                  <CardContent className="p-4">
-                    <p className="text-xl font-bold">100 Credits</p>
-                    <p className="text-sm text-muted-foreground">45 EUR</p>
-                    <Button
-                      onClick={() => handleBuyCredits(100, 45)}
-                      className="w-full mt-4"
-                      disabled={isProcessingPayment}
-                    >
-                      {isProcessingPayment ? t.processing : t.buy}
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* Payment Success Modal */}
-      {paymentSuccess && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-md">
-            <CardHeader>
-              <CardTitle>{t.paymentSuccess}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>{t.creditsAdded}</p>
-              <Button onClick={() => setPaymentSuccess(false)} className="w-full mt-4">
-                {t.close}
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      )}
     </div>
   )
 }

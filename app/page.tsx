@@ -591,30 +591,18 @@ export default function FlightPriceFinder() {
               <Plane className="w-8 h-8 text-white animate-float" />
             </div>
             <div>
-              <h1 className="text-4xl font-bold gradient-text animate-typewriter">{t.title}</h1>
-              <p className="text-lg text-muted-foreground font-medium animate-shimmer">{t.subtitle}</p>
+              <h1 className="text-4xl font-bold gradient-text animate-fade-in-scale">{t.title}</h1>
+              <p className="text-lg text-muted-foreground font-medium animate-fade-in-up animate-delay-200">
+                {t.subtitle}
+              </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-4 animate-slide-in-right">
-            <Button
-              asChild
-              className="bg-blue-800 hover:bg-blue-900 text-white font-bold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 animate-glow"
-            >
-              <a
-                href="https://go.nordvpn.net/SHA9a"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white no-underline"
-              >
-                BEST VPN
-              </a>
-            </Button>
-
+          <div className="flex items-center gap-6 animate-slide-in-right">
             <div className="relative">
               <button
                 onClick={() => setShowLanguageMenu(!showLanguageMenu)}
-                className="flex items-center gap-2 px-4 py-3 rounded-xl glass-card-modern hover-lift-modern transition-all duration-300 animate-glow"
+                className="flex items-center gap-2 px-4 py-3 rounded-xl glass-card-modern hover-lift-modern transition-all duration-300 animate-glow min-w-[80px] justify-center"
               >
                 <span className="text-2xl animate-pulse-modern">
                   {language === "ro" && "🇷🇴"}
@@ -622,11 +610,10 @@ export default function FlightPriceFinder() {
                   {language === "fr" && "🇫🇷"}
                   {language === "es" && "🇪🇸"}
                 </span>
-                <Globe className="w-4 h-4 text-muted-foreground" />
               </button>
 
               {showLanguageMenu && (
-                <div className="absolute top-full right-0 mt-2 bg-card border border-border rounded-xl shadow-2xl p-2 z-50 animate-scale-in">
+                <div className="absolute top-full right-0 mt-2 bg-card border border-border rounded-xl shadow-2xl p-2 z-50 animate-scale-in min-w-[160px]">
                   {[
                     { code: "ro", flag: "🇷🇴", name: "Română" },
                     { code: "en", flag: "🇺🇸", name: "English" },
@@ -656,11 +643,12 @@ export default function FlightPriceFinder() {
         <section className="mb-12 animate-fade-in-up animate-delay-200">
           <div className="glass-card-modern rounded-3xl p-8 hover-lift-modern">
             <div className="text-center mb-8">
-              <h2 className="text-4xl font-bold bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent mb-6 animate-typewriter drop-shadow-lg">
+              <h2 className="text-4xl font-bold bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent mb-6 animate-fade-in-scale drop-shadow-lg">
                 {t.searchTitle}
               </h2>
-              <div className="search-description-box backdrop-blur-sm rounded-2xl p-6 border border-border/50 shadow-lg">
-                <p className="text-xl font-semibold animate-fade-in-up animate-delay-300">
+              <div className="search-description-box backdrop-blur-sm rounded-2xl p-6 border border-border/50 shadow-lg mx-auto max-w-2xl">
+                <p className="text-xl font-semibold animate-fade-in-up animate-delay-300 flex items-center justify-center gap-2 flex-wrap">
+                  <Search className="w-5 h-5 text-accent animate-pulse-modern" />
                   <span>{t.searchDescription2}</span>{" "}
                   <span className="font-bold text-accent animate-pulse-modern">{countries.length}</span>{" "}
                   <span>{t.findBestDeals}</span>
@@ -686,18 +674,18 @@ export default function FlightPriceFinder() {
               </div>
               <Button
                 type="submit"
-                className="h-14 px-8 text-lg rounded-xl btn-modern hover-slide font-semibold"
+                className="h-14 px-6 text-base rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-semibold"
                 disabled={isSearching}
               >
                 {isSearching ? (
                   <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    {t.searching}
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span className="text-white">{t.searching}</span>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
-                    <Zap className="w-5 h-5" />
-                    {t.searchPrices} {countries.length} {t.countriesGlobal}
+                    <Zap className="w-4 h-4 text-white" />
+                    <span className="text-white">{t.searchPrices}</span>
                   </div>
                 )}
               </Button>
@@ -717,6 +705,53 @@ export default function FlightPriceFinder() {
             )}
           </div>
         </section>
+
+        {!isSearching && priceComparisons.length === 0 && (
+          <section className="animate-fade-in-up animate-delay-400">
+            <div className="text-center mb-8">
+              <Button
+                asChild
+                className="bg-gray-900 hover:bg-black text-white font-bold px-8 py-4 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 animate-glow text-lg border-0"
+                style={{ backgroundColor: "#111827", color: "#ffffff" }}
+              >
+                <a
+                  href="https://go.nordvpn.net/SHA9a"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white no-underline flex items-center gap-3"
+                  style={{ color: "#ffffff" }}
+                >
+                  <Globe className="w-6 h-6 text-white" style={{ color: "#ffffff" }} />
+                  <span className="text-white" style={{ color: "#ffffff" }}>
+                    BEST VPN
+                  </span>
+                  <Star className="w-5 h-5 text-white" style={{ color: "#ffffff" }} />
+                </a>
+              </Button>
+            </div>
+
+            <Card className="glass-card-modern hover-lift-modern">
+              <CardHeader>
+                <CardTitle className="text-2xl gradient-text-purple text-center">{t.tipsTitle}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {[t.tip1, t.tip2, t.tip3, t.tip4].map((tip, index) => (
+                    <div
+                      key={index}
+                      className={`flex items-start gap-4 p-4 rounded-xl bg-muted/50 hover-lift-modern animate-slide-in-left animate-delay-${(index + 1) * 100}`}
+                    >
+                      <div className="flex-shrink-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-bold animate-glow">
+                        {index + 1}
+                      </div>
+                      <p className="text-foreground font-medium">{tip}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </section>
+        )}
 
         {!isSearching && priceComparisons.length > 0 && (
           <section className="animate-fade-in-up animate-delay-500">
@@ -820,31 +855,6 @@ export default function FlightPriceFinder() {
                 </Button>
               </div>
             )}
-          </section>
-        )}
-
-        {!isSearching && priceComparisons.length === 0 && (
-          <section className="animate-fade-in-up animate-delay-400">
-            <Card className="glass-card-modern hover-lift-modern">
-              <CardHeader>
-                <CardTitle className="text-2xl gradient-text-purple text-center">{t.tipsTitle}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {[t.tip1, t.tip2, t.tip3, t.tip4].map((tip, index) => (
-                    <div
-                      key={index}
-                      className={`flex items-start gap-4 p-4 rounded-xl bg-muted/50 hover-lift-modern animate-slide-in-left animate-delay-${(index + 1) * 100}`}
-                    >
-                      <div className="flex-shrink-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-bold animate-glow">
-                        {index + 1}
-                      </div>
-                      <p className="text-foreground font-medium">{tip}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
           </section>
         )}
 

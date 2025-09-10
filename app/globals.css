@@ -132,7 +132,7 @@
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -143,7 +143,7 @@
 @keyframes slideInLeft {
   from {
     opacity: 0;
-    transform: translateX(-50px);
+    transform: translateX(-30px);
   }
   to {
     opacity: 1;
@@ -154,7 +154,7 @@
 @keyframes slideInRight {
   from {
     opacity: 0;
-    transform: translateX(50px);
+    transform: translateX(30px);
   }
   to {
     opacity: 1;
@@ -165,7 +165,7 @@
 @keyframes scaleIn {
   from {
     opacity: 0;
-    transform: scale(0.9);
+    transform: scale(0.95);
   }
   to {
     opacity: 1;
@@ -173,23 +173,36 @@
   }
 }
 
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
 @keyframes pulse {
   0%,
   100% {
     transform: scale(1);
+    opacity: 1;
   }
   50% {
-    transform: scale(1.05);
+    transform: scale(1.02);
+    opacity: 0.9;
   }
 }
 
 @keyframes glow {
   0%,
   100% {
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
   }
   50% {
-    box-shadow: 0 0 40px rgba(139, 92, 246, 0.6);
+    box-shadow: 0 0 25px rgba(139, 92, 246, 0.4);
   }
 }
 
@@ -199,7 +212,7 @@
     transform: translateY(0px);
   }
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-6px);
   }
 }
 
@@ -234,37 +247,41 @@
 
 /* Added ultra modern animation classes */
 .animate-fade-in-up {
-  animation: fadeInUp 0.8s ease-out forwards;
+  animation: fadeInUp 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.animate-fade-in-scale {
+  animation: fadeInScale 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 .animate-slide-in-left {
-  animation: slideInLeft 0.6s ease-out forwards;
+  animation: slideInLeft 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 .animate-slide-in-right {
-  animation: slideInRight 0.6s ease-out forwards;
+  animation: slideInRight 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 .animate-scale-in {
-  animation: scaleIn 0.5s ease-out forwards;
+  animation: scaleIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 .animate-pulse-modern {
-  animation: pulse 2s ease-in-out infinite;
+  animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 .animate-glow {
-  animation: glow 2s ease-in-out infinite;
+  animation: glow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 .animate-float {
-  animation: float 3s ease-in-out infinite;
+  animation: float 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 .animate-shimmer {
-  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.4), transparent);
+  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.3), transparent);
   background-size: 200% 100%;
-  animation: shimmer 2s infinite;
+  animation: shimmer 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 .animate-typewriter {
@@ -279,25 +296,25 @@
 
 /* Added ultra modern hover effects */
 .hover-lift-modern {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .hover-lift-modern:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2);
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 15px 30px rgba(139, 92, 246, 0.15);
 }
 
 .hover-glow {
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .hover-glow:hover {
-  box-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
-  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+  transform: scale(1.02);
 }
 
 .hover-slide {
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   position: relative;
   overflow: hidden;
 }
@@ -309,8 +326,8 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  transition: left 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .hover-slide:hover::before {
@@ -318,14 +335,14 @@
 }
 
 .hover-rotate {
-  transition: transform 0.3s ease;
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .hover-rotate:hover {
-  transform: rotate(5deg) scale(1.05);
+  transform: rotate(3deg) scale(1.02);
 }
 
-/* Updated glassmorphism effects with better contrast */
+/* Added ultra modern glassmorphism effects with better contrast */
 .glass-modern {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(20px);
@@ -357,13 +374,18 @@
   -webkit-text-fill-color: transparent;
 }
 
-/* Added modern button styles */
+/* Enhanced button styles with better contrast */
 .btn-modern {
   position: relative;
   overflow: hidden;
   background: linear-gradient(135deg, #1f2937, #374151);
   border: none;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  color: #ffffff !important;
+}
+
+.btn-modern * {
+  color: #ffffff !important;
 }
 
 .btn-modern::before {
@@ -373,8 +395,8 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.4), transparent);
-  transition: left 0.5s;
+  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.3), transparent);
+  transition: left 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .btn-modern:hover::before {
@@ -382,8 +404,46 @@
 }
 
 .btn-modern:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(139, 92, 246, 0.25);
+}
+
+/* Added specific contrast fixes for problematic elements */
+/* Fix search button text contrast */
+.btn-modern span {
+  color: #ffffff !important;
+}
+
+.btn-modern .text-white {
+  color: #ffffff !important;
+}
+
+/* Fix BEST VPN button contrast by making background much darker */
+a[href*="nordvpn"] {
+  background: linear-gradient(135deg, #1e3a8a, #1e40af) !important;
+  color: #ffffff !important;
+}
+
+a[href*="nordvpn"] * {
+  color: #ffffff !important;
+}
+
+/* Ensure all button text is white on dark backgrounds */
+.bg-gradient-to-r.from-blue-800 {
+  background: linear-gradient(135deg, #1e3a8a, #1e40af) !important;
+}
+
+.bg-gradient-to-r.from-blue-800 * {
+  color: #ffffff !important;
+}
+
+/* Override any conflicting text colors in buttons */
+button[type="submit"] span {
+  color: #ffffff !important;
+}
+
+button[type="submit"] .text-white {
+  color: #ffffff !important;
 }
 
 /* Added staggered animation delays */

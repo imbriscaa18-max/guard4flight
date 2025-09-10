@@ -25,8 +25,25 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+
+  if (!publishableKey) {
+    return (
+      <html lang="en">
+        <body className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}>
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="text-center">
+              <h1 className="text-2xl font-bold text-red-600 mb-4">Configuration Error</h1>
+              <p className="text-gray-600">Missing Clerk publishable key. Please check your environment variables.</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    )
+  }
+
   return (
-    <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
+    <ClerkProvider publishableKey={publishableKey}>
       <html lang="en">
         <body className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}>
           <header className="flex justify-end items-center p-4 gap-4 h-16 bg-white/80 backdrop-blur-sm border-b border-blue-100">

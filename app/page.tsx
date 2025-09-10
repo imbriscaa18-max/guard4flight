@@ -613,7 +613,7 @@ export default function FlightPriceFinder() {
               </button>
 
               {showLanguageMenu && (
-                <div className="absolute top-full left-0 mt-2 bg-card border border-border rounded-xl shadow-2xl p-2 z-50 animate-slide-in-left min-w-[160px]">
+                <div className="absolute top-full left-0 mt-2 bg-card border border-border shadow-2xl p-2 z-50 animate-slide-in-left min-w-[160px] rounded-xs">
                   {[
                     { code: "ro", flag: "🇷🇴", name: "Română" },
                     { code: "en", flag: "🇺🇸", name: "English" },

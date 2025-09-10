@@ -334,11 +334,11 @@ export default function FlightPriceFinder() {
   const [language, setLanguage] = useState<"ro" | "en" | "fr" | "es">("ro")
   const [showLanguageMenu, setShowLanguageMenu] = useState(false)
   const [showAnimation, setShowAnimation] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [authMode, setAuthMode] = useState<"login" | "register">("login")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
 
   useEffect(() => {
     if (user) {

@@ -11,23 +11,21 @@ import {
   Plane,
   Search,
   Globe,
-  Clock,
-  TrendingDown,
-  Star,
   CreditCard,
-  LucideUser,
-  Settings,
-  History,
+  User,
   ChevronDown,
   X,
-  Wallet,
-  LogIn,
-  UserPlus,
-  BarChart3,
-  Plus,
+  Clock,
   MapPin,
   ExternalLink,
+  Wallet,
+  History,
+  Settings,
+  Plus,
+  BarChart3,
+  Star,
   ChevronUp,
+  TrendingDown,
 } from "lucide-react"
 import { useUser, useClerk } from "@clerk/nextjs"
 
@@ -334,11 +332,6 @@ export default function FlightPriceFinder() {
   const [language, setLanguage] = useState<"ro" | "en" | "fr" | "es">("ro")
   const [showLanguageMenu, setShowLanguageMenu] = useState(false)
   const [showAnimation, setShowAnimation] = useState(false)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [showAuthModal, setShowAuthModal] = useState(false)
-  const [authMode, setAuthMode] = useState<"login" | "register">("login")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
 
   useEffect(() => {
     if (user) {
@@ -644,13 +637,6 @@ export default function FlightPriceFinder() {
     }
   }
 
-  const handleAuth = async (e: React.FormEvent) => {
-    e.preventDefault()
-    // Placeholder for authentication logic
-    setIsLoggedIn(true)
-    setShowAuthModal(false)
-  }
-
   const lowestPrice = priceComparisons.length > 0 ? Math.min(...priceComparisons.map((p) => p.price)) : 0
   const highestPrice = priceComparisons.length > 0 ? Math.max(...priceComparisons.map((p) => p.price)) : 0
   const maxSavings = highestPrice - lowestPrice
@@ -698,7 +684,7 @@ export default function FlightPriceFinder() {
                         variant="ghost"
                         className="flex items-center gap-1.5 px-2.5 py-1.5 h-auto"
                       >
-                        <LucideUser className="w-3.5 h-3.5" />
+                        <User className="w-3.5 h-3.5" />
                         <span className="text-xs max-w-20 truncate">{user.email}</span>
                         <ChevronDown className="w-3 h-3" />
                       </Button>
@@ -737,16 +723,7 @@ export default function FlightPriceFinder() {
                     </div>
                   </div>
                 </>
-              ) : (
-                <Button
-                  onClick={() => setShowAuthModal(true)}
-                  size="sm"
-                  className="flex items-center gap-1.5 px-3 py-1.5 h-auto"
-                >
-                  <LogIn className="w-3.5 h-3.5" />
-                  <span className="text-xs">Conectează-te</span>
-                </Button>
-              )}
+              ) : null}
 
               {/* Language selector with cleaner design */}
               <div className="flex items-center">
@@ -843,7 +820,7 @@ export default function FlightPriceFinder() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <LucideUser className="w-5 h-5" />
+                    <User className="w-5 h-5" />
                     Informații cont
                   </CardTitle>
                 </CardHeader>
@@ -926,184 +903,11 @@ export default function FlightPriceFinder() {
                     setShowDashboard(false)
                     setShowCreditsModal(true)
                   }}
-                  className="flex items-center gap-2"
                 >
                   <CreditCard className="w-4 h-4" />
                   Cumpără credite
                 </Button>
-                <Button onClick={handleLogout} variant="outline" className="flex items-center gap-2 bg-transparent">
-                  <LogIn className="w-4 h-4" />
-                  Deconectează-te
-                </Button>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {showAuthModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-md mx-4">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  {authMode === "login" ? <LogIn className="w-5 h-5" /> : <UserPlus className="w-5 h-5" />}
-                  {authMode === "login" ? "Conectează-te" : "Creează cont"}
-                </CardTitle>
-                <Button onClick={() => setShowAuthModal(false)} size="sm" variant="ghost">
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-              <CardDescription className="text-gray-600">
-                {isLoggedIn ? "Conectează-te pentru a căuta zboruri" : "Creează un cont nou pentru a începe"}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleAuth} className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium">Email</label>
-                  <Input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="email@example.com"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Parolă</label>
-                  <Input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    required
-                  />
-                </div>
-                <Button type="submit" className="w-full">
-                  {authMode === "login" ? "Conectează-te" : "Creează cont"}
-                </Button>
-                <div className="text-center">
-                  <Button
-                    type="button"
-                    variant="link"
-                    onClick={() => setAuthMode(authMode === "login" ? "register" : "login")}
-                  >
-                    {authMode === "login" ? "Nu ai cont? Creează unul aici" : "Ai deja cont? Conectează-te"}
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {showCreditsModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-md mx-4">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <CreditCard className="w-5 h-5" />
-                  Cumpără credite
-                </CardTitle>
-                <Button
-                  onClick={() => setShowCreditsModal(false)}
-                  size="sm"
-                  variant="ghost"
-                  disabled={isProcessingPayment}
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-              <CardDescription>
-                {paymentSuccess
-                  ? "Plata a fost procesată cu succes!"
-                  : "Ai nevoie de 3 credite pentru fiecare căutare de zbor"}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {paymentSuccess ? (
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <div className="text-2xl">✅</div>
-                  </div>
-                  <h3 className="text-lg font-semibold text-green-700 mb-2">Plata reușită!</h3>
-                  <p className="text-sm text-muted-foreground">Creditele au fost adăugate în contul tău.</p>
-                </div>
-              ) : isProcessingPayment ? (
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 animate-spin">
-                    <CreditCard className="w-8 h-8 text-primary" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">Procesăm plata...</h3>
-                  <p className="text-sm text-muted-foreground">Vă rugăm să așteptați.</p>
-                </div>
-              ) : (
-                <div className="grid gap-3">
-                  <Button
-                    onClick={() => handleBuyCredits(3, 4.5)}
-                    className="flex items-center justify-between p-4 h-auto hover:bg-primary/5 transition-colors"
-                    variant="outline"
-                    disabled={isProcessingPayment}
-                  >
-                    <div className="text-left">
-                      <div className="font-medium">3 credite</div>
-                      <div className="text-sm text-muted-foreground">1 căutare</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-bold">4.5 EUR</div>
-                      <div className="text-sm text-muted-foreground">1.5 EUR/credit</div>
-                    </div>
-                  </Button>
-
-                  <Button
-                    onClick={() => handleBuyCredits(6, 6.5)}
-                    className="flex items-center justify-between p-4 h-auto bg-primary/5 border-primary hover:bg-primary/10 transition-colors"
-                    variant="outline"
-                    disabled={isProcessingPayment}
-                  >
-                    <div className="text-left">
-                      <div className="font-medium">6 credite</div>
-                      <div className="text-sm text-muted-foreground">2 căutări</div>
-                      <Badge className="mt-1 bg-orange-100 text-orange-700 text-xs">Popular</Badge>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-bold">6.5 EUR</div>
-                      <div className="text-sm text-green-600">Economisești 2.5 EUR</div>
-                    </div>
-                  </Button>
-
-                  <Button
-                    onClick={() => handleBuyCredits(9, 8)}
-                    className="flex items-center justify-between p-4 h-auto bg-green-50 border-green-200 hover:bg-green-100 transition-colors relative overflow-hidden"
-                    variant="outline"
-                    disabled={isProcessingPayment}
-                  >
-                    <div className="absolute top-0 right-0 bg-green-500 text-white text-xs px-2 py-1 rounded-bl-lg">
-                      BEST VALUE
-                    </div>
-                    <div className="text-left">
-                      <div className="font-medium">9 credite</div>
-                      <div className="text-sm text-muted-foreground">3 căutări</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-bold">8.0 EUR</div>
-                      <div className="text-sm text-green-600">Economisești 5.5 EUR</div>
-                    </div>
-                  </Button>
-
-                  <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <div className="flex items-center gap-2 text-sm text-blue-700">
-                      <div className="w-4 h-4">🔒</div>
-                      <span className="font-medium">Plată securizată</span>
-                    </div>
-                    <p className="text-xs text-blue-600 mt-1">
-                      Toate tranzacțiile sunt procesate în siguranță prin SSL encryption.
-                    </p>
-                  </div>
-                </div>
-              )}
             </CardContent>
           </Card>
         </div>
@@ -1456,17 +1260,9 @@ export default function FlightPriceFinder() {
                 <Plane className="w-10 h-10 text-primary-foreground animate-float" />
               </div>
               <h3 className="text-xl font-bold text-foreground mb-3">{t.searchToStart}</h3>
-              <p className="text-muted-foreground max-w-md mx-auto">
+              <p className="text-gray-600 text-center max-w-2xl mx-auto leading-relaxed">
                 {t.searchDescription2} {countries.length} {t.findBestDeals}
               </p>
-              {!user && (
-                <div className="mt-6">
-                  <Button onClick={() => setShowAuthModal(true)} className="flex items-center gap-2 mx-auto">
-                    <UserPlus className="w-4 h-4" />
-                    Creează cont
-                  </Button>
-                </div>
-              )}
             </CardContent>
           </Card>
         )}

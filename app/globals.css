@@ -4,40 +4,40 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Updated color tokens to blue-white-gray palette as requested */
-  --background: #ffffff; /* Clean white background */
-  --foreground: #1e3a8a; /* Dark blue text */
-  --card: #f1f5f9; /* Light gray card background */
-  --card-foreground: #1e3a8a; /* Dark blue text on cards */
-  --popover: #ffffff; /* White popover background */
-  --popover-foreground: #1e3a8a; /* Dark blue text in popovers */
-  --primary: #1e3a8a; /* Dark blue primary */
-  --primary-foreground: #ffffff; /* White text on primary */
-  --secondary: #6b7280; /* Medium gray secondary */
-  --secondary-foreground: #ffffff; /* White text on secondary */
-  --muted: #f1f5f9; /* Light gray muted background */
-  --muted-foreground: #6b7280; /* Medium gray muted text */
-  --accent: #3b82f6; /* Sky blue accent */
-  --accent-foreground: #ffffff; /* White text on accent */
-  --destructive: #dc2626; /* Red for alerts */
-  --destructive-foreground: #ffffff; /* White text for destructive */
-  --border: #e5e7eb; /* Light gray borders */
-  --input: #ffffff; /* White input background */
-  --ring: rgba(59, 130, 246, 0.5); /* Sky blue focus ring */
-  --chart-1: #3b82f6; /* Sky blue for charts */
-  --chart-2: #1e3a8a; /* Dark blue for charts */
-  --chart-3: #6b7280; /* Gray for charts */
-  --chart-4: #f1f5f9; /* Light gray for charts */
-  --chart-5: #dc2626; /* Red for charts */
-  --radius: 0.5rem; /* Rounded corners */
-  --sidebar: #f1f5f9; /* Light gray sidebar */
-  --sidebar-foreground: #1e3a8a; /* Dark blue sidebar text */
-  --sidebar-primary: #3b82f6; /* Sky blue sidebar primary */
-  --sidebar-primary-foreground: #ffffff; /* White text for primary sidebar */
-  --sidebar-accent: #1e3a8a; /* Dark blue sidebar accent */
-  --sidebar-accent-foreground: #ffffff; /* White text for sidebar accents */
-  --sidebar-border: #e5e7eb; /* Light gray sidebar border */
-  --sidebar-ring: rgba(59, 130, 246, 0.5); /* Sky blue sidebar focus ring */
+  /* Updated color tokens to orange-based palette as per design brief */
+  --background: #ffffff;
+  --foreground: #4b5563;
+  --card: #fffbeb;
+  --card-foreground: #4b5563;
+  --popover: #ffffff;
+  --popover-foreground: #4b5563;
+  --primary: #ea580c;
+  --primary-foreground: #ffffff;
+  --secondary: #4b5563;
+  --secondary-foreground: #ffffff;
+  --muted: #fffbeb;
+  --muted-foreground: #4b5563;
+  --accent: #f97316;
+  --accent-foreground: #ffffff;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #e5e7eb;
+  --input: #f3f4f6;
+  --ring: #f97316;
+  --chart-1: #ea580c;
+  --chart-2: #f97316;
+  --chart-3: #4b5563;
+  --chart-4: #fffbeb;
+  --chart-5: #ffffff;
+  --radius: 0.25rem;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #4b5563;
+  --sidebar-primary: #ea580c;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f97316;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #e5e7eb;
+  --sidebar-ring: #f97316;
 }
 
 .dark {
@@ -122,23 +122,23 @@
   }
   body {
     @apply bg-background text-foreground;
-    /* Updated background pattern to use blue-white-gray theme */
-    background-image: radial-gradient(circle at 20% 80%, rgba(30, 58, 138, 0.08) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
-      radial-gradient(circle at 40% 40%, rgba(107, 114, 128, 0.03) 0%, transparent 50%);
+    /* Updated background pattern to use orange-based warm theme */
+    background-image: radial-gradient(circle at 20% 80%, rgba(234, 88, 12, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(249, 115, 22, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(75, 85, 99, 0.03) 0%, transparent 50%);
   }
 }
 
-/* Updated glassmorphism effects for blue-white-gray theme */
+/* Updated glassmorphism effects for orange-based theme */
 .glass-card {
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(30, 58, 138, 0.15);
-  box-shadow: 0 8px 32px rgba(30, 58, 138, 0.1);
+  border: 1px solid rgba(234, 88, 12, 0.15);
+  box-shadow: 0 8px 32px rgba(234, 88, 12, 0.1);
 }
 
 .gradient-bg {
-  background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 50%, #e2e8f0 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #fffbeb 50%, #fef3c7 100%);
 }
 
 /* Updated animations for synchronized airplane movement */
@@ -184,10 +184,10 @@
 @keyframes pulse-glow {
   0%,
   100% {
-    box-shadow: 0 0 20px rgba(30, 58, 138, 0.3);
+    box-shadow: 0 0 20px rgba(234, 88, 12, 0.3);
   }
   50% {
-    box-shadow: 0 0 30px rgba(59, 130, 246, 0.4);
+    box-shadow: 0 0 30px rgba(249, 115, 22, 0.4);
   }
 }
 
@@ -207,14 +207,14 @@
   animation: pulse-glow 2s ease-in-out infinite;
 }
 
-/* Updated hover effects for blue-white-gray theme */
+/* Updated hover effects for orange-based theme */
 .hover-lift {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .hover-lift:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(30, 58, 138, 0.15);
+  box-shadow: 0 12px 40px rgba(234, 88, 12, 0.15);
 }
 
 .card-hover {
@@ -223,5 +223,5 @@
 
 .card-hover:hover {
   transform: scale(1.02);
-  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 10px 25px rgba(249, 115, 22, 0.1);
 }

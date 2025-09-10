@@ -645,60 +645,57 @@ export default function FlightPriceFinder() {
 
   return (
     <div className="min-h-screen gradient-bg">
-      <header className="glass-card border-b sticky top-0 z-50">
+      <header className="glass-card border-b sticky top-0 z-50 backdrop-blur-xl bg-white/80 dark:bg-gray-900/80">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl shadow-lg animate-pulse-glow">
-                <Plane className="w-5 h-5 text-primary-foreground animate-float" />
+            <div className="flex items-center gap-4">
+              <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 rounded-2xl shadow-xl animate-pulse-glow">
+                <Plane className="w-6 h-6 text-white animate-float" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent">
                   {t.title}
                 </h1>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
                   {t.subtitle} {countries.length} {t.countries}
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               {user ? (
                 <>
-                  {/* Credits and user info in compact layout */}
-                  <div className="flex items-center gap-3">
-                    {/* Make wallet clickable to open credits modal */}
+                  <div className="flex items-center gap-4">
                     <div
-                      className="flex items-center gap-1.5 bg-primary/10 px-2.5 py-1.5 rounded-lg cursor-pointer hover:bg-primary/20 transition-colors"
+                      className="flex items-center gap-2 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 px-4 py-2 rounded-xl cursor-pointer hover:from-blue-100 hover:to-blue-200 dark:hover:from-blue-800/40 dark:hover:to-blue-700/40 transition-all duration-200 border border-blue-200 dark:border-blue-700"
                       onClick={() => setShowCreditsModal(true)}
                     >
-                      <Wallet className="w-3.5 h-3.5 text-primary" />
-                      <span className="text-sm font-medium text-primary">{user.credits}</span>
+                      <Wallet className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                      <span className="text-sm font-bold text-blue-700 dark:text-blue-300">{user.credits} credite</span>
                     </div>
 
-                    {/* Dropdown menu for user actions */}
                     <div className="relative">
                       <Button
                         onClick={() => setShowUserMenu(!showUserMenu)}
                         size="sm"
                         variant="ghost"
-                        className="flex items-center gap-1.5 px-2.5 py-1.5 h-auto"
+                        className="flex items-center gap-2 px-3 py-2 h-auto hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl"
                       >
-                        <User className="w-3.5 h-3.5" />
-                        <span className="text-xs max-w-20 truncate">{user.email}</span>
+                        <User className="w-4 h-4" />
+                        <span className="text-sm max-w-24 truncate">{user.email}</span>
                         <ChevronDown className="w-3 h-3" />
                       </Button>
 
                       {showUserMenu && (
-                        <div className="absolute right-0 top-full mt-1 bg-background border border-border rounded-lg shadow-lg py-1 min-w-40 z-50">
+                        <div className="absolute right-0 top-full mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl py-2 min-w-48 z-50 backdrop-blur-xl">
                           <button
                             onClick={() => {
                               setShowCreditsModal(true)
                               setShowUserMenu(false)
                             }}
-                            className="w-full px-3 py-2 text-left text-sm hover:bg-muted flex items-center gap-2"
+                            className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors"
                           >
-                            <CreditCard className="w-3.5 h-3.5" />
+                            <CreditCard className="w-4 h-4 text-blue-600" />
                             Cumpără credite
                           </button>
                           <button
@@ -706,15 +703,15 @@ export default function FlightPriceFinder() {
                               setShowDashboard(true)
                               setShowUserMenu(false)
                             }}
-                            className="w-full px-3 py-2 text-left text-sm hover:bg-muted flex items-center gap-2"
+                            className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors"
                           >
-                            <Settings className="w-3.5 h-3.5" />
+                            <Settings className="w-4 h-4 text-gray-600" />
                             Dashboard
                           </button>
-                          <hr className="my-1 border-border" />
+                          <hr className="my-2 border-gray-200 dark:border-gray-600" />
                           <button
                             onClick={handleLogout}
-                            className="w-full px-3 py-2 text-left text-sm hover:bg-muted text-destructive"
+                            className="w-full px-4 py-3 text-left text-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 transition-colors"
                           >
                             Ieșire
                           </button>
@@ -725,17 +722,16 @@ export default function FlightPriceFinder() {
                 </>
               ) : null}
 
-              {/* Language selector with cleaner design */}
               <div className="flex items-center">
                 <select
                   value={language}
                   onChange={(e) => setLanguage(e.target.value as "ro" | "en" | "fr" | "es")}
-                  className="bg-transparent border border-border rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-primary/20 cursor-pointer"
+                  className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer hover:border-blue-300 dark:hover:border-blue-600 transition-colors"
                 >
-                  <option value="ro">🇷🇴</option>
-                  <option value="en">🇬🇧</option>
-                  <option value="fr">🇫🇷</option>
-                  <option value="es">🇪🇸</option>
+                  <option value="ro">🇷🇴 RO</option>
+                  <option value="en">🇬🇧 EN</option>
+                  <option value="fr">🇫🇷 FR</option>
+                  <option value="es">🇪🇸 ES</option>
                 </select>
               </div>
             </div>
@@ -914,17 +910,21 @@ export default function FlightPriceFinder() {
       )}
 
       <main className="container mx-auto px-4 py-8">
-        <Card className="mb-8 glass-card shadow-2xl hover-lift border-2 border-primary/10">
-          <CardHeader className="pb-6 bg-gradient-to-r from-primary/5 to-accent/5 rounded-t-lg">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-xl shadow-lg flex items-center justify-center">
-                <Search className="w-6 h-6 text-white" />
+        <Card className="mb-8 glass-card shadow-2xl hover-lift border border-blue-200/50 dark:border-blue-800/50 overflow-hidden">
+          <CardHeader className="pb-6 bg-gradient-to-r from-blue-50 via-white to-blue-50 dark:from-blue-900/20 dark:via-gray-900 dark:to-blue-900/20 border-b border-blue-100 dark:border-blue-800">
+            <div className="flex items-center gap-6">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 rounded-2xl shadow-xl flex items-center justify-center">
+                <Search className="w-8 h-8 text-white" />
               </div>
               <div>
-                <CardTitle className="text-2xl font-bold text-primary">{t.searchTitle}</CardTitle>
-                <CardDescription className="text-base text-muted-foreground mt-1">
+                <CardTitle className="text-3xl font-bold text-blue-700 dark:text-blue-300">{t.searchTitle}</CardTitle>
+                <CardDescription className="text-lg text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">
                   {t.searchDescription} {countries.length} {t.countriesGlobal}
-                  {user && <div className="mt-2 text-sm text-primary font-medium">💳 Costă 3 credite per căutare</div>}
+                  {user && (
+                    <div className="mt-3 text-sm text-blue-600 dark:text-blue-400 font-semibold bg-blue-50 dark:bg-blue-900/30 px-3 py-1 rounded-lg inline-block">
+                      💳 Costă 3 credite per căutare
+                    </div>
+                  )}
                 </CardDescription>
               </div>
             </div>
@@ -932,7 +932,7 @@ export default function FlightPriceFinder() {
           <CardContent className="p-8">
             <form onSubmit={handleSearch} className="space-y-8">
               <div className="space-y-4">
-                <label className="text-sm font-bold text-primary mb-3 block uppercase tracking-wide">
+                <label className="text-sm font-bold text-blue-700 dark:text-blue-300 mb-3 block uppercase tracking-wide">
                   {t.flightNumber}
                 </label>
                 <div className="relative">
@@ -941,17 +941,17 @@ export default function FlightPriceFinder() {
                     placeholder="ex: LO123, FR456, LH789"
                     value={flightNumber}
                     onChange={(e) => setFlightNumber(e.target.value)}
-                    className="h-14 text-lg pl-12 pr-4 border-2 border-border focus:border-primary transition-all duration-300 rounded-xl shadow-sm bg-white"
+                    className="h-16 text-xl pl-14 pr-4 border-2 border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 transition-all duration-300 rounded-2xl shadow-sm bg-white dark:bg-gray-800 hover:border-blue-300 dark:hover:border-blue-600"
                   />
-                  <Plane className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <Plane className="absolute left-5 top-1/2 transform -translate-y-1/2 w-6 h-6 text-gray-400 dark:text-gray-500" />
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-6">
                 <Button
                   type="submit"
                   disabled={isSearching || !flightNumber.trim()}
-                  className="flex-1 sm:flex-none px-8 h-14 text-lg font-bold bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-xl hover-lift transition-all duration-300 rounded-xl"
+                  className="flex-1 sm:flex-none px-10 h-16 text-xl font-bold bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 shadow-xl hover-lift transition-all duration-300 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSearching ? (
                     <>
@@ -966,15 +966,15 @@ export default function FlightPriceFinder() {
                   )}
                 </Button>
 
-                <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 px-4 py-2 rounded-xl relative">
-                  <Globe className="w-4 h-4" />
-                  <span className="font-medium">
+                <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 px-6 py-4 rounded-2xl relative border border-gray-200 dark:border-gray-600">
+                  <Globe className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  <span className="font-semibold">
                     {countries.length} {t.countriesVerified}
                   </span>
                   {isSearching && (
-                    <div className="absolute -right-28 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                    <div className="absolute -right-32 top-1/2 transform -translate-y-1/2 pointer-events-none">
                       <Plane
-                        className={`w-12 h-12 text-primary drop-shadow-lg ${
+                        className={`w-14 h-14 text-blue-600 drop-shadow-xl ${
                           animationPhase === "takeoff"
                             ? "animate-airplane-takeoff"
                             : animationPhase === "landing"

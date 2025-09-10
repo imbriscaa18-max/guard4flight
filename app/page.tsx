@@ -7,8 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Plane, TrendingDown, CreditCard, User, ChevronDown, Wallet, X, Settings, Plus, BarChart3 } from "lucide-react"
-import { useUser, useClerk } from "@clerk/nextjs"
+import { Plane, TrendingDown, Wallet, Plus, X, Settings, User, BarChart3 } from "lucide-react"
 import countries from "@/data/countries" // Importing countries data
 
 interface PriceComparison {
@@ -337,10 +336,19 @@ const translations = {
   },
 }
 
+const handleBuyCredits = (credits: number, cost: number) => {
+  // Placeholder function for handling credit purchase logic
+  console.log(`Purchased ${credits} credits for ${cost} EUR`)
+}
+
 export default function FlightPriceFinder() {
-  const { user, isLoaded } = useUser()
-  const { signOut } = useClerk()
-  const [userCredits, setUserCredits] = useState<UserCredits>({ credits: 0, searchHistory: [], totalSearches: 0 })
+  const [userCredits, setUserCredits] = useState<UserCredits>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("userCredits")
+      return saved ? JSON.parse(saved) : { credits: 0, searchHistory: [], totalSearches: 0 }
+    }
+    return { credits: 0, searchHistory: [], totalSearches: 0 }
+  })
   const [showCreditsModal, setShowCreditsModal] = useState(false)
   const [showDashboard, setShowDashboard] = useState(false)
   const [isProcessingPayment, setIsProcessingPayment] = useState(false)
@@ -356,59 +364,16 @@ export default function FlightPriceFinder() {
   const [showAnimation, setShowAnimation] = useState(false)
 
   useEffect(() => {
-    if (user) {
-      const credits = (user.publicMetadata.credits as number) || 0
-      const searchHistory = (user.publicMetadata.searchHistory as SearchHistoryItem[]) || []
-      const totalSearches = (user.publicMetadata.totalSearches as number) || 0
-      setUserCredits({ credits, searchHistory, totalSearches })
-    }
-  }, [user])
+    localStorage.setItem("userCredits", JSON.stringify(userCredits))
+  }, [userCredits])
 
-  const updateUserCredits = async (newCredits: Partial<UserCredits>) => {
-    if (!user) return
-
-    const updatedCredits = { ...userCredits, ...newCredits }
-    setUserCredits(updatedCredits)
-
-    await user.update({
-      publicMetadata: {
-        ...user.publicMetadata,
-        ...updatedCredits,
-      },
-    })
+  const updateUserCredits = (newCredits: Partial<UserCredits>) => {
+    setUserCredits((prev) => ({ ...prev, ...newCredits }))
   }
 
   const t = translations[language]
 
-  const handleLogout = () => {
-    signOut()
-    setPriceComparisons([])
-    setShowDashboard(false)
-  }
-
-  const handleBuyCredits = async (credits: number, price: number) => {
-    setIsProcessingPayment(true)
-
-    setTimeout(async () => {
-      await updateUserCredits({ credits: userCredits.credits + credits })
-      setIsProcessingPayment(false)
-      setPaymentSuccess(true)
-
-      setTimeout(() => {
-        setPaymentSuccess(false)
-        setShowCreditsModal(false)
-      }, 2000)
-    }, 2000)
-  }
-
   const searchPrices = async () => {
-    if (!flightNumber.trim()) return
-
-    if (!user) {
-      alert(t.loginRequired)
-      return
-    }
-
     if (userCredits.credits < 3) {
       setShowCreditsModal(true)
       return
@@ -417,7 +382,7 @@ export default function FlightPriceFinder() {
     setIsSearching(true)
     setShowAnimation(true)
 
-    await updateUserCredits({ credits: userCredits.credits - 3 })
+    updateUserCredits({ credits: userCredits.credits - 3 })
 
     const generatePriceVariation = (basePrice: number, flightNumber: string, countryIndex: number) => {
       const flightHash = flightNumber.split("").reduce((a, b) => {
@@ -666,102 +631,199 @@ export default function FlightPriceFinder() {
   const displayedComparisons = showAllCountries ? priceComparisons : priceComparisons.slice(0, 15)
 
   return (
-    <div className="min-h-screen gradient-bg">
-      <header className="glass-card border-b sticky top-0 z-50 backdrop-blur-xl bg-white/80 dark:bg-gray-900/80">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-primary via-accent to-primary rounded-2xl shadow-xl animate-pulse-glow">
-                <Plane className="w-6 h-6 text-white animate-float" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                  {t.title}
-                </h1>
-                <p className="text-sm text-muted-foreground font-medium">
-                  {t.subtitle} {countries.length} {t.countries}
-                </p>
-              </div>
+    <div className="min-h-screen bg-gradient-to-br from-sky-50 via-blue-50 to-indigo-100 relative overflow-hidden">
+      {/* Header */}
+      <header className="relative z-10 p-4 md:p-6">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          {/* Logo and Title */}
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-primary via-accent to-primary rounded-2xl shadow-xl animate-pulse-glow">
+              <Plane className="w-6 h-6 text-white animate-float" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                {t.title}
+              </h1>
+              <p className="text-sm text-muted-foreground font-medium">
+                {t.subtitle} {countries.length} {t.countries}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            {/* Language Selector */}
+            <div className="relative">
+              <select
+                value={language}
+                onChange={(e) => setLanguage(e.target.value as "ro" | "en" | "fr" | "es")}
+                className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer hover:border-blue-300 dark:hover:border-blue-600 transition-colors"
+              >
+                <option value="ro">🇷🇴 RO</option>
+                <option value="en">🇬🇧 EN</option>
+                <option value="fr">🇫🇷 FR</option>
+                <option value="es">🇪🇸 ES</option>
+              </select>
             </div>
 
             <div className="flex items-center gap-4">
-              {user ? (
-                <>
-                  <div className="flex items-center gap-4">
-                    <div
-                      className="flex items-center gap-2 bg-gradient-to-r from-muted to-card px-4 py-2 rounded-xl cursor-pointer hover:from-card hover:to-muted transition-all duration-200 border border-border"
-                      onClick={() => setShowCreditsModal(true)}
-                    >
-                      <Wallet className="w-4 h-4 text-primary" />
-                      <span className="text-sm font-bold text-primary">{user.credits} credite</span>
-                    </div>
-
-                    <div className="relative">
-                      <Button
-                        onClick={() => setShowUserMenu(!showUserMenu)}
-                        size="sm"
-                        variant="ghost"
-                        className="flex items-center gap-2 px-3 py-2 h-auto hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl"
-                      >
-                        <User className="w-4 h-4" />
-                        <span className="text-sm max-w-24 truncate">{user.email}</span>
-                        <ChevronDown className="w-3 h-3" />
-                      </Button>
-
-                      {showUserMenu && (
-                        <div className="absolute right-0 top-full mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl py-2 min-w-48 z-50 backdrop-blur-xl">
-                          <button
-                            onClick={() => {
-                              setShowCreditsModal(true)
-                              setShowUserMenu(false)
-                            }}
-                            className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors"
-                          >
-                            <CreditCard className="w-4 h-4 text-blue-600" />
-                            Cumpără credite
-                          </button>
-                          <button
-                            onClick={() => {
-                              setShowDashboard(true)
-                              setShowUserMenu(false)
-                            }}
-                            className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors"
-                          >
-                            <Settings className="w-4 h-4 text-gray-600" />
-                            Dashboard
-                          </button>
-                          <hr className="my-2 border-gray-200 dark:border-gray-600" />
-                          <button
-                            onClick={handleLogout}
-                            className="w-full px-4 py-3 text-left text-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 transition-colors"
-                          >
-                            Ieșire
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </>
-              ) : null}
-
-              <div className="flex items-center">
-                <select
-                  value={language}
-                  onChange={(e) => setLanguage(e.target.value as "ro" | "en" | "fr" | "es")}
-                  className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer hover:border-blue-300 dark:hover:border-blue-600 transition-colors"
-                >
-                  <option value="ro">🇷🇴 RO</option>
-                  <option value="en">🇬🇧 EN</option>
-                  <option value="fr">🇫🇷 FR</option>
-                  <option value="es">🇪🇸 ES</option>
-                </select>
+              <div
+                className="flex items-center gap-2 bg-gradient-to-r from-muted to-card px-4 py-2 rounded-xl cursor-pointer hover:from-card hover:to-muted transition-all duration-200 border border-border"
+                onClick={() => setShowCreditsModal(true)}
+              >
+                <Wallet className="w-4 h-4 text-primary" />
+                <span className="text-sm font-bold text-primary">{userCredits.credits} credite</span>
               </div>
+
+              <Button
+                onClick={() => setShowDashboard(true)}
+                size="sm"
+                variant="ghost"
+                className="flex items-center gap-2 px-3 py-2 h-auto hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl"
+              >
+                <Settings className="w-4 h-4" />
+                <span className="text-sm">Dashboard</span>
+              </Button>
             </div>
           </div>
         </div>
       </header>
 
-      {showDashboard && user && (
+      {/* Main Content */}
+      <main className="relative z-10 max-w-7xl mx-auto p-4 md:p-6">
+        {/* Search Section */}
+        <section className="mb-8">
+          <h2 className="text-2xl font-bold mb-4">{t.searchTitle}</h2>
+          <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
+            <Input
+              type="text"
+              placeholder={t.flightNumber}
+              value={flightNumber}
+              onChange={(e) => setFlightNumber(e.target.value)}
+              className="flex-grow"
+            />
+            <Button type="submit" className="w-full md:w-auto">
+              {t.searchPrices} {countries.length} {t.countriesGlobal}
+            </Button>
+          </form>
+        </section>
+
+        {/* Results Section */}
+        <section>
+          {isSearching && (
+            <div className="flex items-center justify-center">
+              <p className="text-lg font-medium">{t.searching}</p>
+            </div>
+          )}
+
+          {!isSearching && priceComparisons.length > 0 && (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                {displayedComparisons.map((comparison) => (
+                  <Card key={comparison.country}>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <img src={comparison.flag || "/placeholder.svg"} alt={comparison.country} className="w-6 h-6" />
+                        {comparison.country}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <p className="text-sm text-muted-foreground">{t.price}:</p>
+                          <p className="font-medium">{comparison.price} EUR</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-muted-foreground">{t.airline}:</p>
+                          <p className="font-medium">{comparison.airline}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <p className="text-sm text-muted-foreground">{t.duration}:</p>
+                          <p className="font-medium">{comparison.duration}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-muted-foreground">{t.currency}:</p>
+                          <p className="font-medium">EUR</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <Button asChild className="w-full">
+                          <a href={comparison.bookingUrl} target="_blank" rel="noopener noreferrer">
+                            {t.bookNow}
+                          </a>
+                        </Button>
+                        {!comparison.isOfficial && (
+                          <Badge variant="secondary" className="ml-auto">
+                            {t.unofficialSite}
+                          </Badge>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Summary */}
+              <div className="mt-8">
+                <p className="text-lg font-medium mb-4">{t.priceDisclaimer}</p>
+                <div className="flex flex-col md:flex-row justify-between gap-4 mb-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">{t.lowestPrice}:</p>
+                    <p className="font-medium">{lowestPrice} EUR</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">{t.highestPrice}:</p>
+                    <p className="font-medium">{highestPrice} EUR</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">{t.maxDifference}:</p>
+                    <p className="font-medium">{maxSavings} EUR</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">{t.potentialSavings}:</p>
+                    <p className="font-medium">{t.vsLowest}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">{t.countriesChecked}:</p>
+                    <p className="font-medium">
+                      {priceComparisons.length} {t.countries}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">{t.globalComparison}:</p>
+                    <p className="font-medium">{t.vsHighest}</p>
+                  </div>
+                </div>
+                <Button onClick={() => setShowAllCountries(!showAllCountries)} size="sm">
+                  {showAllCountries ? t.showLess : t.showAll}
+                </Button>
+              </div>
+            </>
+          )}
+
+          {!isSearching && priceComparisons.length === 0 && (
+            <div className="flex items-center justify-center">
+              <p className="text-lg font-medium">{t.searchToStart}</p>
+            </div>
+          )}
+
+          {!isSearching && priceComparisons.length === 0 && (
+            <div className="mt-8">
+              <h3 className="text-xl font-bold mb-4">{t.tipsTitle}</h3>
+              <ul className="list-disc list-inside space-y-2">
+                <li>{t.tip1}</li>
+                <li>{t.tip2}</li>
+                <li>{t.tip3}</li>
+                <li>{t.tip4}</li>
+              </ul>
+            </div>
+          )}
+        </section>
+      </main>
+
+      {/* Dashboard Modal */}
+      {showDashboard && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <CardHeader>
@@ -779,7 +841,6 @@ export default function FlightPriceFinder() {
             <CardContent className="space-y-6">
               {/* Account Overview */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Make dashboard wallet section clickable to buy credits */}
                 <Card
                   className="cursor-pointer hover:shadow-md transition-shadow"
                   onClick={() => setShowCreditsModal(true)}
@@ -791,7 +852,7 @@ export default function FlightPriceFinder() {
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Credite disponibile</p>
-                        <p className="text-2xl font-bold text-primary">{user.credits}</p>
+                        <p className="text-2xl font-bold text-primary">{userCredits.credits}</p>
                       </div>
                       <div className="ml-auto">
                         <Button size="sm" variant="outline">
@@ -811,7 +872,7 @@ export default function FlightPriceFinder() {
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Total căutări</p>
-                        <p className="text-2xl font-bold text-secondary">{user.totalSearches}</p>
+                        <p className="text-2xl font-bold text-secondary">{userCredits.totalSearches}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -826,7 +887,7 @@ export default function FlightPriceFinder() {
                       <div>
                         <p className="text-sm text-muted-foreground">Economii totale</p>
                         <p className="text-2xl font-bold text-green-600">
-                          {user.searchHistory.reduce((total, search) => total + search.savings, 0)} EUR
+                          {userCredits.searchHistory.reduce((total, search) => total + search.savings, 0)} EUR
                         </p>
                       </div>
                     </div>
@@ -834,7 +895,6 @@ export default function FlightPriceFinder() {
                 </Card>
               </div>
 
-              {/* Account Information */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -844,16 +904,12 @@ export default function FlightPriceFinder() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Email:</span>
-                    <span className="font-medium">{user.email}</span>
+                    <span className="text-sm text-muted-foreground">Credite:</span>
+                    <span className="font-medium">{userCredits.credits}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Membru din:</span>
-                    <span className="font-medium">{user.createdAt.toLocaleDateString("ro-RO")}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">ID utilizator:</span>
-                    <span className="font-mono text-sm">{user.id}</span>
+                    <span className="text-sm text-muted-foreground">Căutări efectuate:</span>
+                    <span className="font-medium">{userCredits.totalSearches}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -901,139 +957,100 @@ export default function FlightPriceFinder() {
         </div>
       )}
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold">{t.searchTitle}</h2>
-          <Button onClick={() => setShowAllCountries(!showAllCountries)} size="sm">
-            {showAllCountries ? t.showLess : t.showAll}
-          </Button>
-        </div>
-
-        <form onSubmit={handleSearch} className="mb-8">
-          <Input
-            type="text"
-            placeholder={t.flightNumber}
-            value={flightNumber}
-            onChange={(e) => setFlightNumber(e.target.value)}
-            className="w-full mb-4"
-          />
-          <Button type="submit" className="w-full">
-            {t.searchPrices} {countries.length} {t.countriesGlobal}
-          </Button>
-        </form>
-
-        {isSearching && (
-          <div className="flex items-center justify-center">
-            <p className="text-lg font-medium">{t.searching}</p>
-          </div>
-        )}
-
-        {!isSearching && priceComparisons.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {displayedComparisons.map((comparison) => (
-              <Card key={comparison.country}>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <img src={comparison.flag || "/placeholder.svg"} alt={comparison.country} className="w-6 h-6" />
-                    {comparison.country}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <p className="text-sm text-muted-foreground">{t.price}:</p>
-                      <p className="font-medium">{comparison.price} EUR</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">{t.airline}:</p>
-                      <p className="font-medium">{comparison.airline}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <p className="text-sm text-muted-foreground">{t.duration}:</p>
-                      <p className="font-medium">{comparison.duration}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">{t.currency}:</p>
-                      <p className="font-medium">EUR</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Button asChild className="w-full">
-                      <a href={comparison.bookingUrl} target="_blank" rel="noopener noreferrer">
-                        {t.bookNow}
-                      </a>
+      {/* Buy Credits Modal */}
+      {showCreditsModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>{t.buyCreditsTitle}</CardTitle>
+                <Button onClick={() => setShowCreditsModal(false)} size="sm" variant="ghost">
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+              <CardDescription>{t.buyCreditsDesc}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <h3 className="text-lg font-semibold">{t.creditPackages}</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Example Credit Packages */}
+                <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                  <CardContent className="p-4">
+                    <p className="text-xl font-bold">10 Credits</p>
+                    <p className="text-sm text-muted-foreground">5 EUR</p>
+                    <Button
+                      onClick={() => handleBuyCredits(10, 5)}
+                      className="w-full mt-4"
+                      disabled={isProcessingPayment}
+                    >
+                      {isProcessingPayment ? t.processing : t.buy}
                     </Button>
-                    {!comparison.isOfficial && (
-                      <Badge variant="secondary" className="ml-auto">
-                        {t.unofficialSite}
-                      </Badge>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
+                  </CardContent>
+                </Card>
 
-        {!isSearching && priceComparisons.length > 0 && (
-          <div className="mt-8">
-            <p className="text-lg font-medium mb-4">{t.priceDisclaimer}</p>
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <p className="text-sm text-muted-foreground">{t.lowestPrice}:</p>
-                <p className="font-medium">{lowestPrice} EUR</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">{t.highestPrice}:</p>
-                <p className="font-medium">{highestPrice} EUR</p>
-              </div>
-            </div>
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <p className="text-sm text-muted-foreground">{t.maxDifference}:</p>
-                <p className="font-medium">{maxSavings} EUR</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">{t.potentialSavings}:</p>
-                <p className="font-medium">{t.vsLowest}</p>
-              </div>
-            </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">{t.countriesChecked}:</p>
-                <p className="font-medium">
-                  {priceComparisons.length} {t.countries}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">{t.globalComparison}:</p>
-                <p className="font-medium">{t.vsHighest}</p>
-              </div>
-            </div>
-          </div>
-        )}
+                <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                  <CardContent className="p-4">
+                    <p className="text-xl font-bold">25 Credits</p>
+                    <p className="text-sm text-muted-foreground">12 EUR</p>
+                    <Button
+                      onClick={() => handleBuyCredits(25, 12)}
+                      className="w-full mt-4"
+                      disabled={isProcessingPayment}
+                    >
+                      {isProcessingPayment ? t.processing : t.buy}
+                    </Button>
+                  </CardContent>
+                </Card>
 
-        {!isSearching && priceComparisons.length === 0 && (
-          <div className="flex items-center justify-center">
-            <p className="text-lg font-medium">{t.searchToStart}</p>
-          </div>
-        )}
+                <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                  <CardContent className="p-4">
+                    <p className="text-xl font-bold">50 Credits</p>
+                    <p className="text-sm text-muted-foreground">23 EUR</p>
+                    <Button
+                      onClick={() => handleBuyCredits(50, 23)}
+                      className="w-full mt-4"
+                      disabled={isProcessingPayment}
+                    >
+                      {isProcessingPayment ? t.processing : t.buy}
+                    </Button>
+                  </CardContent>
+                </Card>
 
-        {!isSearching && priceComparisons.length === 0 && (
-          <div className="mt-8">
-            <h3 className="text-xl font-bold mb-4">{t.tipsTitle}</h3>
-            <ul className="list-disc list-inside space-y-2">
-              <li>{t.tip1}</li>
-              <li>{t.tip2}</li>
-              <li>{t.tip3}</li>
-              <li>{t.tip4}</li>
-            </ul>
-          </div>
-        )}
-      </main>
+                <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                  <CardContent className="p-4">
+                    <p className="text-xl font-bold">100 Credits</p>
+                    <p className="text-sm text-muted-foreground">45 EUR</p>
+                    <Button
+                      onClick={() => handleBuyCredits(100, 45)}
+                      className="w-full mt-4"
+                      disabled={isProcessingPayment}
+                    >
+                      {isProcessingPayment ? t.processing : t.buy}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Payment Success Modal */}
+      {paymentSuccess && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle>{t.paymentSuccess}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>{t.creditsAdded}</p>
+              <Button onClick={() => setPaymentSuccess(false)} className="w-full mt-4">
+                {t.close}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   )
 }

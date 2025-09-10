@@ -56,7 +56,7 @@ const translations = {
     noSearches: "Nu ai efectuat încă căutări",
     buyCreditsTitle: "Cumpără credite",
     buyCreditsDesc: "Alege un pachet de credite pentru a continua căutările",
-    creditPackages: "Pachete disponibile",
+    creditPackages: "Paquetele disponibile",
     buy: "Cumpără",
     processing: "Se procesează...",
     paymentSuccess: "Plata a fost procesată cu succes!",
@@ -597,10 +597,24 @@ export default function FlightPriceFinder() {
           </div>
 
           <div className="flex items-center gap-4 animate-slide-in-right">
+            <Button
+              asChild
+              className="bg-blue-800 hover:bg-blue-900 text-white font-bold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 animate-glow"
+            >
+              <a
+                href="https://go.nordvpn.net/SHA9a"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white no-underline"
+              >
+                BEST VPN
+              </a>
+            </Button>
+
             <div className="relative">
               <button
                 onClick={() => setShowLanguageMenu(!showLanguageMenu)}
-                className="flex items-center gap-2 px-4 py-3 rounded-xl glass-card-modern hover-lift-modern transition-all duration-300"
+                className="flex items-center gap-2 px-4 py-3 rounded-xl glass-card-modern hover-lift-modern transition-all duration-300 animate-glow"
               >
                 <span className="text-2xl animate-pulse-modern">
                   {language === "ro" && "🇷🇴"}
@@ -642,11 +656,16 @@ export default function FlightPriceFinder() {
         <section className="mb-12 animate-fade-in-up animate-delay-200">
           <div className="glass-card-modern rounded-3xl p-8 hover-lift-modern">
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold gradient-text-purple mb-4 animate-typewriter">{t.searchTitle}</h2>
-              <p className="text-lg text-foreground animate-fade-in-up animate-delay-300">
-                {t.searchDescription2} <span className="font-bold text-accent">{countries.length}</span>{" "}
-                {t.findBestDeals}
-              </p>
+              <h2 className="text-4xl font-bold bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent mb-6 animate-typewriter drop-shadow-lg">
+                {t.searchTitle}
+              </h2>
+              <div className="search-description-box backdrop-blur-sm rounded-2xl p-6 border border-border/50 shadow-lg">
+                <p className="text-xl font-semibold animate-fade-in-up animate-delay-300">
+                  <span>{t.searchDescription2}</span>{" "}
+                  <span className="font-bold text-accent animate-pulse-modern">{countries.length}</span>{" "}
+                  <span>{t.findBestDeals}</span>
+                </p>
+              </div>
             </div>
 
             <form
@@ -759,7 +778,7 @@ export default function FlightPriceFinder() {
                       </div>
                       {comparison.price > lowestPrice && (
                         <div className="text-right">
-                          <p className="text-muted-foreground">+{comparison.price - lowestPrice} EUR</p>
+                          <p className="text-sm text-muted-foreground">+{comparison.price - lowestPrice} EUR</p>
                           <p className="text-xs text-red-600">{t.vsLowest}</p>
                         </div>
                       )}
@@ -817,7 +836,7 @@ export default function FlightPriceFinder() {
                       key={index}
                       className={`flex items-start gap-4 p-4 rounded-xl bg-muted/50 hover-lift-modern animate-slide-in-left animate-delay-${(index + 1) * 100}`}
                     >
-                      <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-primary-foreground font-bold animate-glow">
+                      <div className="flex-shrink-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-bold animate-glow">
                         {index + 1}
                       </div>
                       <p className="text-foreground font-medium">{tip}</p>
@@ -830,8 +849,28 @@ export default function FlightPriceFinder() {
         )}
 
         {priceComparisons.length > 0 && (
-          <div className="mt-12 text-center animate-fade-in-up animate-delay-600">
-            <p className="text-muted-foreground bg-muted/50 rounded-xl p-4 inline-block">⚠️ {t.priceDisclaimer}</p>
+          <div className="mt-12 animate-fade-in-up animate-delay-600">
+            <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-l-4 border-yellow-400 rounded-xl p-6 mb-8 shadow-lg">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center">
+                    <span className="text-yellow-800 font-bold text-lg">⚠️</span>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-yellow-800 mb-2">WARNING / AVERTISMENT</h3>
+                  <p className="text-yellow-700 font-medium">
+                    {language === "ro"
+                      ? "Prețurile pot suferi ajustări imediate și nu pot coincide întotdeauna cu cele din rezultat. Verificați întotdeauna prețurile pe site-urile oficiale înainte de rezervare."
+                      : "Prices may change immediately and may not always match the results shown. Always verify prices on official websites before booking."}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="text-center">
+              <p className="text-muted-foreground bg-muted/50 rounded-xl p-4 inline-block">💡 {t.priceDisclaimer}</p>
+            </div>
           </div>
         )}
       </main>

@@ -406,3 +406,33 @@
 .animate-delay-500 {
   animation-delay: 0.5s;
 }
+
+/* Added more specific high contrast search description box styles to override glassmorphism */
+.search-description-box {
+  background: #1e293b !important;
+  color: #ffffff !important;
+  backdrop-filter: none !important;
+}
+
+.search-description-box p {
+  color: #ffffff !important;
+}
+
+.search-description-box span {
+  color: #ffffff !important;
+}
+
+.search-description-box .text-accent,
+.search-description-box span.text-accent {
+  color: #fbbf24 !important;
+}
+
+.search-description-box .animate-pulse-modern {
+  color: #fbbf24 !important;
+}
+
+/* Override any glassmorphism effects on the search description */
+.glass-card-modern .search-description-box {
+  background: #1e293b !important;
+  backdrop-filter: none !important;
+}

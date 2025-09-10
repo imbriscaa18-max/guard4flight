@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Plane } from "lucide-react"
-import countries from "@/data/countries" // Importing countries data
+import { Plane, Globe, TrendingDown, Search, Star, Zap } from "lucide-react"
+import countries from "@/data/countries"
 
 interface PriceComparison {
   country: string
@@ -576,173 +576,264 @@ export default function FlightPriceFinder() {
   const displayedComparisons = showAllCountries ? priceComparisons : priceComparisons.slice(0, 15)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-50 via-blue-50 to-indigo-100 relative overflow-hidden">
-      {/* Header */}
-      <header className="relative z-10 p-4 md:p-6">
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-accent/10 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-float animate-delay-300"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-secondary/10 rounded-full blur-3xl animate-pulse-modern"></div>
+      </div>
+
+      <header className="relative z-10 p-4 md:p-6 animate-fade-in-up">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          {/* Logo and Title */}
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-primary via-accent to-primary rounded-2xl shadow-xl animate-pulse-glow">
-              <Plane className="w-6 h-6 text-white animate-float" />
+          <div className="flex items-center space-x-4 animate-slide-in-left">
+            <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary via-accent to-secondary rounded-3xl shadow-2xl animate-glow hover-rotate">
+              <Plane className="w-8 h-8 text-white animate-float" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                {t.title}
-              </h1>
-              <p className="text-sm text-muted-foreground font-medium">
-                {t.subtitle} {countries.length} {t.countries}
-              </p>
+              <h1 className="text-4xl font-bold gradient-text animate-typewriter">{t.title}</h1>
+              <p className="text-lg text-muted-foreground font-medium animate-shimmer">{t.subtitle}</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            {/* Language Selector */}
+          <div className="flex items-center gap-4 animate-slide-in-right">
             <div className="relative">
               <button
                 onClick={() => setShowLanguageMenu(!showLanguageMenu)}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-card border border-border hover:bg-muted transition-colors"
+                className="flex items-center gap-2 px-4 py-3 rounded-xl glass-card-modern hover-lift-modern transition-all duration-300"
               >
-                <span className="text-lg">
+                <span className="text-2xl animate-pulse-modern">
                   {language === "ro" && "🇷🇴"}
                   {language === "en" && "🇺🇸"}
                   {language === "fr" && "🇫🇷"}
                   {language === "es" && "🇪🇸"}
                 </span>
+                <Globe className="w-4 h-4 text-muted-foreground" />
               </button>
+
+              {showLanguageMenu && (
+                <div className="absolute top-full right-0 mt-2 bg-card border border-border rounded-xl shadow-2xl p-2 z-50 animate-scale-in">
+                  {[
+                    { code: "ro", flag: "🇷🇴", name: "Română" },
+                    { code: "en", flag: "🇺🇸", name: "English" },
+                    { code: "fr", flag: "🇫🇷", name: "Français" },
+                    { code: "es", flag: "🇪🇸", name: "Español" },
+                  ].map((lang, index) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => {
+                        setLanguage(lang.code as "ro" | "en" | "fr" | "es")
+                        setShowLanguageMenu(false)
+                      }}
+                      className={`flex items-center gap-3 w-full px-4 py-2 rounded-lg hover:bg-muted transition-all duration-200 animate-fade-in-up animate-delay-${(index + 1) * 100}`}
+                    >
+                      <span className="text-lg">{lang.flag}</span>
+                      <span className="font-medium">{lang.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="relative z-10 max-w-7xl mx-auto p-4 md:p-6">
-        {/* Search Section */}
-        <section className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">{t.searchTitle}</h2>
-          <form
-            onSubmit={(e) =>
-              handleSearch(e, flightNumber, setIsSearching, setShowAnimation, setPriceComparisons, setAnimationPhase)
-            }
-            className="flex flex-col md:flex-row gap-4"
-          >
-            <Input
-              type="text"
-              placeholder={t.flightNumber}
-              value={flightNumber}
-              onChange={(e) => setFlightNumber(e.target.value)}
-              className="flex-grow"
-            />
-            <Button type="submit" className="w-full md:w-auto">
-              {t.searchPrices} {countries.length} {t.countriesGlobal}
-            </Button>
-          </form>
+        <section className="mb-12 animate-fade-in-up animate-delay-200">
+          <div className="glass-card-modern rounded-3xl p-8 hover-lift-modern">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold gradient-text-purple mb-4 animate-typewriter">{t.searchTitle}</h2>
+              <p className="text-lg text-foreground animate-fade-in-up animate-delay-300">
+                {t.searchDescription2} <span className="font-bold text-accent">{countries.length}</span>{" "}
+                {t.findBestDeals}
+              </p>
+            </div>
+
+            <form
+              onSubmit={(e) =>
+                handleSearch(e, flightNumber, setIsSearching, setShowAnimation, setPriceComparisons, setAnimationPhase)
+              }
+              className="flex flex-col md:flex-row gap-4 animate-scale-in animate-delay-400"
+            >
+              <div className="flex-grow relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+                <Input
+                  type="text"
+                  placeholder={t.flightNumber}
+                  value={flightNumber}
+                  onChange={(e) => setFlightNumber(e.target.value)}
+                  className="pl-12 h-14 text-lg rounded-xl border-2 focus:border-accent transition-all duration-300 hover-glow"
+                />
+              </div>
+              <Button
+                type="submit"
+                className="h-14 px-8 text-lg rounded-xl btn-modern hover-slide font-semibold"
+                disabled={isSearching}
+              >
+                {isSearching ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    {t.searching}
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Zap className="w-5 h-5" />
+                    {t.searchPrices} {countries.length} {t.countriesGlobal}
+                  </div>
+                )}
+              </Button>
+            </form>
+
+            {/* Animated airplane during search */}
+            {showAnimation && animationPhase !== "idle" && (
+              <div className="flex justify-center mt-8">
+                <div className="relative">
+                  <Plane
+                    className={`w-12 h-12 text-accent ${
+                      animationPhase === "takeoff" ? "animate-slide-in-left" : "animate-slide-in-right"
+                    }`}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
         </section>
 
-        {/* Results Section */}
-        <section>
-          {isSearching && (
-            <div className="flex items-center justify-center">
-              <p className="text-lg font-medium">{t.searching}</p>
+        {!isSearching && priceComparisons.length > 0 && (
+          <section className="animate-fade-in-up animate-delay-500">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+              {[
+                { label: t.lowestPrice, value: `${lowestPrice} EUR`, icon: TrendingDown, color: "text-green-600" },
+                { label: t.highestPrice, value: `${highestPrice} EUR`, icon: Star, color: "text-red-600" },
+                { label: t.maxDifference, value: `${maxSavings} EUR`, icon: Zap, color: "text-accent" },
+                { label: t.countriesChecked, value: `${priceComparisons.length}`, icon: Globe, color: "text-primary" },
+              ].map((stat, index) => (
+                <Card
+                  key={stat.label}
+                  className={`glass-card-modern hover-lift-modern animate-scale-in animate-delay-${(index + 1) * 100}`}
+                >
+                  <CardContent className="p-6 text-center">
+                    <stat.icon className={`w-8 h-8 mx-auto mb-3 ${stat.color} animate-pulse-modern`} />
+                    <p className="text-sm text-muted-foreground mb-1">{stat.label}</p>
+                    <p className="text-2xl font-bold gradient-text-purple">{stat.value}</p>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
-          )}
 
-          {!isSearching && priceComparisons.length > 0 && (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                {displayedComparisons.map((comparison) => (
-                  <Card key={comparison.country}>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <img src={comparison.flag || "/placeholder.svg"} alt={comparison.country} className="w-6 h-6" />
-                        {comparison.country}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex items-center justify-between mb-4">
-                        <div>
-                          <p className="text-sm text-muted-foreground">{t.price}:</p>
-                          <p className="font-medium">{comparison.price} EUR</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">{t.airline}:</p>
-                          <p className="font-medium">{comparison.airline}</p>
-                        </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              {displayedComparisons.map((comparison, index) => (
+                <Card
+                  key={comparison.country}
+                  className={`glass-card-modern hover-lift-modern animate-fade-in-up animate-delay-${Math.min((index + 1) * 100, 500)} ${
+                    comparison.price === lowestPrice ? "ring-2 ring-green-500 ring-opacity-50" : ""
+                  }`}
+                >
+                  <CardHeader className="pb-4">
+                    <CardTitle className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl animate-pulse-modern">{comparison.flag}</span>
+                        <span className="font-bold">{comparison.country}</span>
                       </div>
-                      <div className="flex items-center justify-between mb-4">
-                        <div>
-                          <p className="text-sm text-muted-foreground">{t.duration}:</p>
-                          <p className="font-medium">{comparison.duration}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">{t.currency}:</p>
-                          <p className="font-medium">EUR</p>
-                        </div>
+                      {comparison.price === lowestPrice && (
+                        <Badge className="bg-green-500 text-white animate-glow">{t.cheapest}</Badge>
+                      )}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-muted-foreground">{t.price}</p>
+                        <p className="text-2xl font-bold gradient-text-purple">{comparison.price} EUR</p>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <Button asChild className="w-full">
+                      <div className="text-right">
+                        <p className="text-sm text-muted-foreground">{t.airline}</p>
+                        <p className="font-semibold">{comparison.airline}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between text-sm">
+                      <div>
+                        <p className="text-muted-foreground">{t.duration}</p>
+                        <p className="font-medium">{comparison.duration}</p>
+                      </div>
+                      {comparison.price > lowestPrice && (
+                        <div className="text-right">
+                          <p className="text-muted-foreground">+{comparison.price - lowestPrice} EUR</p>
+                          <p className="text-xs text-red-600">{t.vsLowest}</p>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex gap-2">
+                      {comparison.isOfficial ? (
+                        <Button asChild className="flex-1 btn-modern hover-slide">
                           <a href={comparison.bookingUrl} target="_blank" rel="noopener noreferrer">
                             {t.bookNow}
                           </a>
                         </Button>
-                        {!comparison.isOfficial && (
-                          <Badge variant="secondary" className="ml-auto">
-                            {t.unofficialSite}
-                          </Badge>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                      ) : (
+                        <>
+                          <Button disabled className="flex-1 bg-gray-400 cursor-not-allowed">
+                            {t.bookNow}
+                          </Button>
+                          <Button asChild variant="outline" size="sm" className="hover-glow bg-transparent">
+                            <a href={comparison.bookingUrl} target="_blank" rel="noopener noreferrer">
+                              {t.skyscanner}
+                            </a>
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
 
-              {/* Summary */}
-              <div className="mt-8">
-                <p className="text-lg font-medium mb-4">{t.priceDisclaimer}</p>
-                <div className="flex flex-col md:flex-row justify-between gap-4 mb-4">
-                  <div>
-                    <p className="text-sm text-muted-foreground">{t.lowestPrice}:</p>
-                    <p className="font-medium">{lowestPrice} EUR</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">{t.highestPrice}:</p>
-                    <p className="font-medium">{highestPrice} EUR</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">{t.maxDifference}:</p>
-                    <p className="font-medium">{maxSavings} EUR</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">{t.countriesChecked}:</p>
-                    <p className="font-medium">
-                      {priceComparisons.length} {t.countries}
-                    </p>
-                  </div>
-                </div>
-                <Button onClick={() => setShowAllCountries(!showAllCountries)} size="sm">
-                  {showAllCountries ? t.showLess : t.showAll}
+            {priceComparisons.length > 15 && (
+              <div className="text-center animate-fade-in-up animate-delay-300">
+                <Button
+                  onClick={() => setShowAllCountries(!showAllCountries)}
+                  variant="outline"
+                  className="px-8 py-3 rounded-xl hover-lift-modern"
+                >
+                  {showAllCountries ? t.showLess : `${t.showAll} (+${priceComparisons.length - 15} ${t.moreCountries})`}
                 </Button>
               </div>
-            </>
-          )}
+            )}
+          </section>
+        )}
 
-          {!isSearching && priceComparisons.length === 0 && (
-            <div className="flex items-center justify-center">
-              <p className="text-lg font-medium">{t.searchToStart}</p>
-            </div>
-          )}
+        {!isSearching && priceComparisons.length === 0 && (
+          <section className="animate-fade-in-up animate-delay-400">
+            <Card className="glass-card-modern hover-lift-modern">
+              <CardHeader>
+                <CardTitle className="text-2xl gradient-text-purple text-center">{t.tipsTitle}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {[t.tip1, t.tip2, t.tip3, t.tip4].map((tip, index) => (
+                    <div
+                      key={index}
+                      className={`flex items-start gap-4 p-4 rounded-xl bg-muted/50 hover-lift-modern animate-slide-in-left animate-delay-${(index + 1) * 100}`}
+                    >
+                      <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-primary-foreground font-bold animate-glow">
+                        {index + 1}
+                      </div>
+                      <p className="text-foreground font-medium">{tip}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </section>
+        )}
 
-          {!isSearching && priceComparisons.length === 0 && (
-            <div className="mt-8">
-              <h3 className="text-xl font-bold mb-4">{t.tipsTitle}</h3>
-              <ul className="list-disc list-inside space-y-2">
-                <li>{t.tip1}</li>
-                <li>{t.tip2}</li>
-                <li>{t.tip3}</li>
-                <li>{t.tip4}</li>
-              </ul>
-            </div>
-          )}
-        </section>
+        {priceComparisons.length > 0 && (
+          <div className="mt-12 text-center animate-fade-in-up animate-delay-600">
+            <p className="text-muted-foreground bg-muted/50 rounded-xl p-4 inline-block">⚠️ {t.priceDisclaimer}</p>
+          </div>
+        )}
       </main>
     </div>
   )

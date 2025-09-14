@@ -25,7 +25,7 @@ const translations = {
     title: "Guard4Flight",
     subtitle: "Găsește cel mai mic preț pentru biletele de avion",
     flightNumber: "Numărul zborului",
-    searchPrices: "Caută prețuri în",
+    searchPrices: "CAUTĂ",
     countries: "țări verificate",
     searching: "Se caută...",
     results: "Rezultate pentru zborul",
@@ -63,7 +63,7 @@ const translations = {
     creditsAdded: "Creditele au fost adăugate în contul tău.",
     close: "Închide",
     loginRequired: "Trebuie să te autentifici pentru a căuta prețuri",
-    searchTitle: "Caută prețuri bilete de avion",
+    searchTitle: "Caută prețuri la bilete de avion",
     searchDescription: "Introdu numărul zborului și compară prețurile în",
     countriesGlobal: "țări",
     countriesVerified: "țări verificate",
@@ -92,13 +92,13 @@ const translations = {
     tipsTitle: "Sfaturi pentru economii maxime",
     searchToStart: "Introdu numărul zborului pentru a începe căutarea",
     searchDescription2: "Compară prețurile în",
-    findBestDeals: "și găsește cele mai bune oferte",
+    findBestDeals: "de țări și găsește cele mai bun preț",
   },
   en: {
     title: "Guard4Flight",
     subtitle: "Find the cheapest flight prices",
     flightNumber: "Flight number",
-    searchPrices: "Search prices in",
+    searchPrices: "SEARCH",
     countries: "countries verified",
     searching: "Searching...",
     results: "Results for flight",
@@ -165,13 +165,13 @@ const translations = {
     tipsTitle: "Tips for maximum savings",
     searchToStart: "Enter the flight number to start searching",
     searchDescription2: "Compare prices in",
-    findBestDeals: "and find the best deals",
+    findBestDeals: "countries and find the best price",
   },
   fr: {
     title: "Guard4Flight",
     subtitle: "Trouvez les prix de vols les moins chers",
     flightNumber: "Numéro de vol",
-    searchPrices: "Rechercher les prix dans",
+    searchPrices: "RECHERCHER",
     countries: "pays vérifiés",
     searching: "Recherche...",
     results: "Résultats pour le vol",
@@ -238,13 +238,13 @@ const translations = {
     tipsTitle: "Conseils pour des économies maximales",
     searchToStart: "Entrez le numéro de vol pour commencer la recherche",
     searchDescription2: "Comparez les prix dans",
-    findBestDeals: "et trouvez les meilleures offres",
+    findBestDeals: "pays et trouvez le meilleur prix",
   },
   es: {
     title: "Guard4Flight",
     subtitle: "Encuentra los precios de vuelos más baratos",
     flightNumber: "Número de vuelo",
-    searchPrices: "Buscar precios en",
+    searchPrices: "BUSCAR",
     countries: "países verificados",
     searching: "Buscando...",
     results: "Resultados para el vuelo",
@@ -311,7 +311,7 @@ const translations = {
     tipsTitle: "Consejos para ahorros máximos",
     searchToStart: "Ingrese el número de vuelo para comenzar la búsqueda",
     searchDescription2: "Compare precios en",
-    findBestDeals: "y encuentra las mejores ofertas",
+    findBestDeals: "países y encuentra el mejor precio",
   },
 }
 
@@ -617,11 +617,11 @@ export default function FlightPriceFinder() {
           <div className="flex items-center gap-6 animate-slide-in-right">
             <button
               onClick={cycleLanguage}
-              className="flex items-center gap-3 px-6 py-3 rounded-2xl glass-card-modern hover-lift-modern transition-all duration-300 animate-glow min-w-[120px] justify-center border-2 border-accent/20 hover:border-accent/40"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl glass-card-modern hover-lift-modern transition-all duration-300 animate-glow border border-accent/30 hover:border-accent/50"
             >
-              <span className="text-2xl animate-pulse-modern">{getCurrentLanguageInfo().flag}</span>
-              <span className="font-bold text-foreground text-lg">{getCurrentLanguageInfo().name}</span>
-              <div className="w-2 h-2 bg-accent rounded-full animate-pulse"></div>
+              <span className="text-xl">{getCurrentLanguageInfo().flag}</span>
+              <span className="font-semibold text-foreground">{getCurrentLanguageInfo().name}</span>
+              <div className="w-1 h-1 bg-accent rounded-full animate-pulse"></div>
             </button>
           </div>
         </div>
@@ -639,7 +639,7 @@ export default function FlightPriceFinder() {
                   <Search className="w-5 h-5 text-accent animate-pulse-modern" />
                   <span>{t.searchDescription}</span>{" "}
                   <span className="font-bold text-accent animate-pulse-modern">{countries.length}</span>{" "}
-                  <span>{t.countriesGlobal}</span>
+                  <span>{t.findBestDeals}</span>
                 </p>
               </div>
             </div>
@@ -662,7 +662,7 @@ export default function FlightPriceFinder() {
               </div>
               <Button
                 type="submit"
-                className="h-14 px-6 text-base rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-semibold"
+                className="h-14 px-8 text-base rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-semibold min-w-[140px]"
                 disabled={isSearching}
               >
                 {isSearching ? (

@@ -1,22 +1,23 @@
-import { Inter } from 'next/font/google';
-import { ClerkProvider } from '@clerk/nextjs'; // Importă Clerk
+import type React from "react"
+import { Inter } from "next/font/google"
+import "./globals.css"
 
-const inter = Inter({ subsets: ['latin'] });
-
-export default function RootLayout({ children }) {
-  return (
-    {/* Învelește totul cu <ClerkProvider> */}
-    <ClerkProvider>
-      <html lang="en">
-        <body className={inter.className}>{children}</body>
-      </html>
-    </ClerkProvider>
-  );
-}
-
-
-import './globals.css'
+const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
-      generator: 'v0.app'
-    };
+  title: "Flight Price Finder",
+  description: "Caută și compară prețurile la bilete de avion",
+    generator: 'v0.app'
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      <body className={inter.className}>{children}</body>
+    </html>
+  )
+}

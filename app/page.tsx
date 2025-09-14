@@ -564,7 +564,6 @@ export default function FlightPriceFinder() {
   const [animationPhase, setAnimationPhase] = useState<"idle" | "takeoff" | "landing">("idle")
   const [showAllCountries, setShowAllCountries] = useState(false)
   const [language, setLanguage] = useState<"ro" | "en" | "fr" | "es">("ro")
-  const [showLanguageMenu, setShowLanguageMenu] = useState(false)
   const [showAnimation, setShowAnimation] = useState(false)
 
   const t = translations[language]
@@ -574,6 +573,23 @@ export default function FlightPriceFinder() {
   const maxSavings = highestPrice - lowestPrice
 
   const displayedComparisons = showAllCountries ? priceComparisons : priceComparisons.slice(0, 15)
+
+  const cycleLanguage = () => {
+    const languages: ("ro" | "en" | "fr" | "es")[] = ["ro", "en", "fr", "es"]
+    const currentIndex = languages.indexOf(language)
+    const nextIndex = (currentIndex + 1) % languages.length
+    setLanguage(languages[nextIndex])
+  }
+
+  const getCurrentLanguageInfo = () => {
+    const languageInfo = {
+      ro: { flag: "🇷🇴", name: "RO" },
+      en: { flag: "🇺🇸", name: "EN" },
+      fr: { flag: "🇫🇷", name: "FR" },
+      es: { flag: "🇪🇸", name: "ES" },
+    }
+    return languageInfo[language]
+  }
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
@@ -599,42 +615,14 @@ export default function FlightPriceFinder() {
           </div>
 
           <div className="flex items-center gap-6 animate-slide-in-right">
-            <div className="relative ml-8">
-              <button
-                onClick={() => setShowLanguageMenu(!showLanguageMenu)}
-                className="flex items-center gap-2 px-4 py-3 rounded-xl glass-card-modern hover-lift-modern transition-all duration-300 animate-glow min-w-[80px] justify-center"
-              >
-                <span className="text-2xl animate-pulse-modern">
-                  {language === "ro" && "🇷🇴"}
-                  {language === "en" && "🇺🇸"}
-                  {language === "fr" && "🇫🇷"}
-                  {language === "es" && "🇪🇸"}
-                </span>
-              </button>
-
-              {showLanguageMenu && (
-                <div className="absolute top-full left-0 mt-2 bg-card border border-border shadow-2xl p-2 z-50 animate-slide-in-left min-w-[160px] rounded-xs">
-                  {[
-                    { code: "ro", flag: "🇷🇴", name: "Română" },
-                    { code: "en", flag: "🇺🇸", name: "English" },
-                    { code: "fr", flag: "🇫🇷", name: "Français" },
-                    { code: "es", flag: "🇪🇸", name: "Español" },
-                  ].map((lang, index) => (
-                    <button
-                      key={lang.code}
-                      onClick={() => {
-                        setLanguage(lang.code as "ro" | "en" | "fr" | "es")
-                        setShowLanguageMenu(false)
-                      }}
-                      className={`flex items-center gap-3 w-full px-4 py-2 rounded-lg hover:bg-muted transition-all duration-200 animate-fade-in-up animate-delay-${(index + 1) * 100}`}
-                    >
-                      <span className="text-lg">{lang.flag}</span>
-                      <span className="font-medium">{lang.name}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            <button
+              onClick={cycleLanguage}
+              className="flex items-center gap-3 px-6 py-3 rounded-2xl glass-card-modern hover-lift-modern transition-all duration-300 animate-glow min-w-[120px] justify-center border-2 border-accent/20 hover:border-accent/40"
+            >
+              <span className="text-2xl animate-pulse-modern">{getCurrentLanguageInfo().flag}</span>
+              <span className="font-bold text-foreground text-lg">{getCurrentLanguageInfo().name}</span>
+              <div className="w-2 h-2 bg-accent rounded-full animate-pulse"></div>
+            </button>
           </div>
         </div>
       </header>
@@ -644,14 +632,14 @@ export default function FlightPriceFinder() {
           <div className="glass-card-modern rounded-3xl p-8 hover-lift-modern">
             <div className="text-center mb-8">
               <h2 className="text-4xl font-bold bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent mb-6 animate-fade-in-scale drop-shadow-lg">
-                Caută prețuri la bilete de avion
+                {t.searchTitle}
               </h2>
               <div className="search-description-box backdrop-blur-sm rounded-2xl p-6 border border-border/50 shadow-lg mx-auto max-w-2xl">
                 <p className="text-xl font-semibold animate-fade-in-up animate-delay-300 flex items-center justify-center gap-2 flex-wrap">
                   <Search className="w-5 h-5 text-accent animate-pulse-modern" />
-                  <span>Compară prețurile în</span>{" "}
+                  <span>{t.searchDescription}</span>{" "}
                   <span className="font-bold text-accent animate-pulse-modern">{countries.length}</span>{" "}
-                  <span>de țări și găsește cele mai bun preț</span>
+                  <span>{t.countriesGlobal}</span>
                 </p>
               </div>
             </div>
@@ -685,7 +673,7 @@ export default function FlightPriceFinder() {
                 ) : (
                   <div className="flex items-center gap-2">
                     <Zap className="w-4 h-4 text-white" />
-                    <span className="text-white">CAUTĂ</span>
+                    <span className="text-white">{t.searchPrices}</span>
                   </div>
                 )}
               </Button>

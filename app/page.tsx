@@ -599,7 +599,7 @@ export default function FlightPriceFinder() {
           </div>
 
           <div className="flex items-center gap-6 animate-slide-in-right">
-            <div className="relative">
+            <div className="relative ml-8">
               <button
                 onClick={() => setShowLanguageMenu(!showLanguageMenu)}
                 className="flex items-center gap-2 px-4 py-3 rounded-xl glass-card-modern hover-lift-modern transition-all duration-300 animate-glow min-w-[80px] justify-center"
@@ -644,14 +644,14 @@ export default function FlightPriceFinder() {
           <div className="glass-card-modern rounded-3xl p-8 hover-lift-modern">
             <div className="text-center mb-8">
               <h2 className="text-4xl font-bold bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent mb-6 animate-fade-in-scale drop-shadow-lg">
-                {t.searchTitle}
+                Caută prețuri la bilete de avion
               </h2>
               <div className="search-description-box backdrop-blur-sm rounded-2xl p-6 border border-border/50 shadow-lg mx-auto max-w-2xl">
                 <p className="text-xl font-semibold animate-fade-in-up animate-delay-300 flex items-center justify-center gap-2 flex-wrap">
                   <Search className="w-5 h-5 text-accent animate-pulse-modern" />
-                  <span>{t.searchDescription2}</span>{" "}
+                  <span>Compară prețurile în</span>{" "}
                   <span className="font-bold text-accent animate-pulse-modern">{countries.length}</span>{" "}
-                  <span>{t.findBestDeals}</span>
+                  <span>de țări și găsește cele mai bun preț</span>
                 </p>
               </div>
             </div>
@@ -685,7 +685,7 @@ export default function FlightPriceFinder() {
                 ) : (
                   <div className="flex items-center gap-2">
                     <Zap className="w-4 h-4 text-white" />
-                    <span className="text-white">{t.searchPrices}</span>
+                    <span className="text-white">CAUTĂ</span>
                   </div>
                 )}
               </Button>

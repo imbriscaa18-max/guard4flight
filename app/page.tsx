@@ -2,11 +2,12 @@
 
 import type React from "react"
 import { useState } from "react"
+import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Plane, Globe, TrendingDown, Search, Star, Zap } from "lucide-react"
+import { Plane, Globe, TrendingDown, Search, Star, Zap, Lock } from "lucide-react"
 import countries from "@/data/countries"
 
 interface PriceComparison {
@@ -628,71 +629,107 @@ export default function FlightPriceFinder() {
       </header>
 
       <main className="relative z-10 max-w-7xl mx-auto p-4 md:p-6">
-        <section className="mb-12 animate-fade-in-up animate-delay-200">
-          <div className="glass-card-modern rounded-3xl p-8 hover-lift-modern">
-            <div className="text-center mb-8">
-              <h2 className="text-4xl font-bold bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent mb-6 animate-fade-in-scale drop-shadow-lg">
-                {t.searchTitle}
-              </h2>
-              <div className="search-description-box backdrop-blur-sm rounded-2xl p-6 border border-border/50 shadow-lg mx-auto max-w-2xl">
-                <p className="text-xl font-semibold animate-fade-in-up animate-delay-300 flex items-center justify-center gap-2 flex-wrap">
-                  <Search className="w-5 h-5 text-accent animate-pulse-modern" />
-                  <span>{t.searchDescription}</span>{" "}
-                  <span className="font-bold text-accent animate-pulse-modern">{countries.length}</span>{" "}
-                  <span>{t.findBestDeals}</span>
-                </p>
-              </div>
-            </div>
-
-            <form
-              onSubmit={(e) =>
-                handleSearch(e, flightNumber, setIsSearching, setShowAnimation, setPriceComparisons, setAnimationPhase)
-              }
-              className="flex flex-col md:flex-row gap-4 animate-scale-in animate-delay-400"
-            >
-              <div className="flex-grow relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
-                <Input
-                  type="text"
-                  placeholder={t.flightNumber}
-                  value={flightNumber}
-                  onChange={(e) => setFlightNumber(e.target.value)}
-                  className="pl-12 h-14 text-lg rounded-xl border-2 focus:border-accent transition-all duration-300 hover-glow"
-                />
-              </div>
-              <Button
-                type="submit"
-                className="h-14 px-8 text-base rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-semibold min-w-[140px]"
-                disabled={isSearching}
-              >
-                {isSearching ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span className="text-white">{t.searching}</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-white" />
-                    <span className="text-white">{t.searchPrices}</span>
-                  </div>
-                )}
-              </Button>
-            </form>
-
-            {/* Animated airplane during search */}
-            {showAnimation && animationPhase !== "idle" && (
-              <div className="flex justify-center mt-8">
-                <div className="relative">
-                  <Plane
-                    className={`w-12 h-12 text-accent ${
-                      animationPhase === "takeoff" ? "animate-slide-in-left" : "animate-slide-in-right"
-                    }`}
-                  />
+        <SignedOut>
+          <section className="mb-12 animate-fade-in-up animate-delay-200">
+            <div className="glass-card-modern rounded-3xl p-8 hover-lift-modern">
+              <div className="text-center mb-8">
+                <h2 className="text-4xl font-bold bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent mb-6 animate-fade-in-scale drop-shadow-lg">
+                  {t.searchTitle}
+                </h2>
+                <div className="search-description-box backdrop-blur-sm rounded-2xl p-6 border border-border/50 shadow-lg mx-auto max-w-2xl">
+                  <p className="text-xl font-semibold animate-fade-in-up animate-delay-300 flex items-center justify-center gap-2 flex-wrap">
+                    <Lock className="w-5 h-5 text-accent animate-pulse-modern" />
+                    <span>{t.loginRequired}</span>
+                  </p>
                 </div>
               </div>
-            )}
-          </div>
-        </section>
+
+              <div className="text-center">
+                <SignInButton mode="modal">
+                  <Button className="h-14 px-8 text-base rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-semibold min-w-[200px]">
+                    <Lock className="w-4 h-4 mr-2" />
+                    Sign In to Search
+                  </Button>
+                </SignInButton>
+              </div>
+            </div>
+          </section>
+        </SignedOut>
+
+        <SignedIn>
+          <section className="mb-12 animate-fade-in-up animate-delay-200">
+            <div className="glass-card-modern rounded-3xl p-8 hover-lift-modern">
+              <div className="text-center mb-8">
+                <h2 className="text-4xl font-bold bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent mb-6 animate-fade-in-scale drop-shadow-lg">
+                  {t.searchTitle}
+                </h2>
+                <div className="search-description-box backdrop-blur-sm rounded-2xl p-6 border border-border/50 shadow-lg mx-auto max-w-2xl">
+                  <p className="text-xl font-semibold animate-fade-in-up animate-delay-300 flex items-center justify-center gap-2 flex-wrap">
+                    <Search className="w-5 h-5 text-accent animate-pulse-modern" />
+                    <span>{t.searchDescription}</span>{" "}
+                    <span className="font-bold text-accent animate-pulse-modern">{countries.length}</span>{" "}
+                    <span>{t.findBestDeals}</span>
+                  </p>
+                </div>
+              </div>
+
+              <form
+                onSubmit={(e) =>
+                  handleSearch(
+                    e,
+                    flightNumber,
+                    setIsSearching,
+                    setShowAnimation,
+                    setPriceComparisons,
+                    setAnimationPhase,
+                  )
+                }
+                className="flex flex-col md:flex-row gap-4 animate-scale-in animate-delay-400"
+              >
+                <div className="flex-grow relative">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+                  <Input
+                    type="text"
+                    placeholder={t.flightNumber}
+                    value={flightNumber}
+                    onChange={(e) => setFlightNumber(e.target.value)}
+                    className="pl-12 h-14 text-lg rounded-xl border-2 focus:border-accent transition-all duration-300 hover-glow"
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  className="h-14 px-8 text-base rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-semibold min-w-[140px]"
+                  disabled={isSearching}
+                >
+                  {isSearching ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span className="text-white">{t.searching}</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <Zap className="w-4 h-4 text-white" />
+                      <span className="text-white">{t.searchPrices}</span>
+                    </div>
+                  )}
+                </Button>
+              </form>
+
+              {/* Animated airplane during search */}
+              {showAnimation && animationPhase !== "idle" && (
+                <div className="flex justify-center mt-8">
+                  <div className="relative">
+                    <Plane
+                      className={`w-12 h-12 text-accent ${
+                        animationPhase === "takeoff" ? "animate-slide-in-left" : "animate-slide-in-right"
+                      }`}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+        </SignedIn>
 
         {!isSearching && priceComparisons.length === 0 && (
           <section className="animate-fade-in-up animate-delay-400">
@@ -741,141 +778,145 @@ export default function FlightPriceFinder() {
           </section>
         )}
 
-        {!isSearching && priceComparisons.length > 0 && (
-          <section className="animate-fade-in-up animate-delay-500">
-            <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-3 gap-6 mb-8">
-              {[
-                { label: t.lowestPrice, value: `${lowestPrice} EUR`, icon: TrendingDown, color: "text-green-600" },
-                { label: t.highestPrice, value: `${highestPrice} EUR`, icon: Star, color: "text-red-600" },
-                { label: t.maxDifference, value: `${maxSavings} EUR`, icon: Zap, color: "text-accent" },
-                {
-                  label: t.countriesChecked,
-                  value: `${priceComparisons.length}`,
-                  icon: Globe,
-                  color: "text-primary",
-                },
-              ].map((stat, index) => (
-                <Card
-                  key={stat.label}
-                  className={`glass-card-modern hover-lift-modern animate-scale-in animate-delay-${(index + 1) * 100}`}
-                >
-                  <CardContent className="p-6 text-center">
-                    <stat.icon className={`w-8 h-8 mx-auto mb-3 ${stat.color} animate-pulse-modern`} />
-                    <p className="text-sm text-muted-foreground mb-1">{stat.label}</p>
-                    <p className="text-2xl font-bold gradient-text-purple">{stat.value}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+        <SignedIn>
+          {!isSearching && priceComparisons.length > 0 && (
+            <section className="animate-fade-in-up animate-delay-500">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                {[
+                  { label: t.lowestPrice, value: `${lowestPrice} EUR`, icon: TrendingDown, color: "text-green-600" },
+                  { label: t.highestPrice, value: `${highestPrice} EUR`, icon: Star, color: "text-red-600" },
+                  { label: t.maxDifference, value: `${maxSavings} EUR`, icon: Zap, color: "text-accent" },
+                  {
+                    label: t.countriesChecked,
+                    value: `${priceComparisons.length}`,
+                    icon: Globe,
+                    color: "text-primary",
+                  },
+                ].map((stat, index) => (
+                  <Card
+                    key={stat.label}
+                    className={`glass-card-modern hover-lift-modern animate-scale-in animate-delay-${(index + 1) * 100}`}
+                  >
+                    <CardContent className="p-6 text-center">
+                      <stat.icon className={`w-8 h-8 mx-auto mb-3 ${stat.color} animate-pulse-modern`} />
+                      <p className="text-sm text-muted-foreground mb-1">{stat.label}</p>
+                      <p className="text-2xl font-bold gradient-text-purple">{stat.value}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {displayedComparisons.map((comparison, index) => (
-                <Card
-                  key={comparison.country}
-                  className={`glass-card-modern hover-lift-modern animate-fade-in-up animate-delay-${Math.min((index + 1) * 100, 500)} ${
-                    comparison.price === lowestPrice ? "ring-2 ring-green-500 ring-opacity-50" : ""
-                  }`}
-                >
-                  <CardHeader className="pb-4">
-                    <CardTitle className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <span className="text-2xl animate-pulse-modern">{comparison.flag}</span>
-                        <span className="font-bold">{comparison.country}</span>
-                      </div>
-                      {comparison.price === lowestPrice && (
-                        <Badge className="bg-green-500 text-white animate-glow">{t.cheapest}</Badge>
-                      )}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm text-muted-foreground">{t.price}</p>
-                        <p className="text-2xl font-bold gradient-text-purple">{comparison.price} EUR</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm text-muted-foreground">{t.airline}</p>
-                        <p className="font-semibold">{comparison.airline}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between text-sm">
-                      <div>
-                        <p className="text-muted-foreground">{t.duration}</p>
-                        <p className="font-medium">{comparison.duration}</p>
-                      </div>
-                      {comparison.price > lowestPrice && (
-                        <div className="text-right">
-                          <p className="text-sm text-muted-foreground">+{comparison.price - lowestPrice} EUR</p>
-                          <p className="text-xs text-red-600">{t.vsLowest}</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                {displayedComparisons.map((comparison, index) => (
+                  <Card
+                    key={comparison.country}
+                    className={`glass-card-modern hover-lift-modern animate-fade-in-up animate-delay-${Math.min((index + 1) * 100, 500)} ${
+                      comparison.price === lowestPrice ? "ring-2 ring-green-500 ring-opacity-50" : ""
+                    }`}
+                  >
+                    <CardHeader className="pb-4">
+                      <CardTitle className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl animate-pulse-modern">{comparison.flag}</span>
+                          <span className="font-bold">{comparison.country}</span>
                         </div>
-                      )}
-                    </div>
+                        {comparison.price === lowestPrice && (
+                          <Badge className="bg-green-500 text-white animate-glow">{t.cheapest}</Badge>
+                        )}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-muted-foreground">{t.price}</p>
+                          <p className="text-2xl font-bold gradient-text-purple">{comparison.price} EUR</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm text-muted-foreground">{t.airline}</p>
+                          <p className="font-semibold">{comparison.airline}</p>
+                        </div>
+                      </div>
 
-                    <div className="flex gap-2">
-                      {comparison.isOfficial ? (
-                        <Button asChild className="flex-1 btn-modern hover-slide">
-                          <a href={comparison.bookingUrl} target="_blank" rel="noopener noreferrer">
-                            {t.bookNow}
-                          </a>
-                        </Button>
-                      ) : (
-                        <>
-                          <Button disabled className="flex-1 bg-gray-400 cursor-not-allowed">
-                            {t.bookNow}
-                          </Button>
-                          <Button asChild variant="outline" size="sm" className="hover-glow bg-transparent">
+                      <div className="flex items-center justify-between text-sm">
+                        <div>
+                          <p className="text-muted-foreground">{t.duration}</p>
+                          <p className="font-medium">{comparison.duration}</p>
+                        </div>
+                        {comparison.price > lowestPrice && (
+                          <div className="text-right">
+                            <p className="text-sm text-muted-foreground">+{comparison.price - lowestPrice} EUR</p>
+                            <p className="text-xs text-red-600">{t.vsLowest}</p>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex gap-2">
+                        {comparison.isOfficial ? (
+                          <Button asChild className="flex-1 btn-modern hover-slide">
                             <a href={comparison.bookingUrl} target="_blank" rel="noopener noreferrer">
-                              {t.skyscanner}
+                              {t.bookNow}
                             </a>
                           </Button>
-                        </>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            {priceComparisons.length > 15 && (
-              <div className="text-center animate-fade-in-up animate-delay-300">
-                <Button
-                  onClick={() => setShowAllCountries(!showAllCountries)}
-                  variant="outline"
-                  className="px-8 py-3 rounded-xl hover-lift-modern"
-                >
-                  {showAllCountries ? t.showLess : `${t.showAll} (+${priceComparisons.length - 15} ${t.moreCountries})`}
-                </Button>
+                        ) : (
+                          <>
+                            <Button disabled className="flex-1 bg-gray-400 cursor-not-allowed">
+                              {t.bookNow}
+                            </Button>
+                            <Button asChild variant="outline" size="sm" className="hover-glow bg-transparent">
+                              <a href={comparison.bookingUrl} target="_blank" rel="noopener noreferrer">
+                                {t.skyscanner}
+                              </a>
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
-            )}
-          </section>
-        )}
 
-        {priceComparisons.length > 0 && (
-          <div className="mt-12 animate-fade-in-up animate-delay-600">
-            <div className="bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-500 rounded-xl p-6 mb-8 shadow-lg">
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-lg">!</span>
+              {priceComparisons.length > 15 && (
+                <div className="text-center animate-fade-in-up animate-delay-300">
+                  <Button
+                    onClick={() => setShowAllCountries(!showAllCountries)}
+                    variant="outline"
+                    className="px-8 py-3 rounded-xl hover-lift-modern"
+                  >
+                    {showAllCountries
+                      ? t.showLess
+                      : `${t.showAll} (+${priceComparisons.length - 15} ${t.moreCountries})`}
+                  </Button>
+                </div>
+              )}
+            </section>
+          )}
+
+          {priceComparisons.length > 0 && (
+            <div className="mt-12 animate-fade-in-up animate-delay-600">
+              <div className="bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-500 rounded-xl p-6 mb-8 shadow-lg">
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                      <span className="text-white font-bold text-lg">!</span>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-red-800 mb-2">WARNING / AVERTISMENT</h3>
+                    <p className="text-red-700 font-medium">
+                      {language === "ro"
+                        ? "Prețurile pot suferi ajustări imediate și nu pot coincide întotdeauna cu cele din rezultat. Verificați întotdeauna prețurile pe site-urile oficiale înainte de rezervare."
+                        : "Prices may change immediately and may not always match the results shown. Always verify prices on official websites before booking."}
+                    </p>
                   </div>
                 </div>
-                <div>
-                  <h3 className="text-lg font-bold text-red-800 mb-2">WARNING / AVERTISMENT</h3>
-                  <p className="text-red-700 font-medium">
-                    {language === "ro"
-                      ? "Prețurile pot suferi ajustări imediate și nu pot coincide întotdeauna cu cele din rezultat. Verificați întotdeauna prețurile pe site-urile oficiale ale companiilor aeriene înainte de rezervare."
-                      : "Prices may change immediately and may not always match the results shown. Always verify prices on official websites before booking."}
-                  </p>
-                </div>
+              </div>
+
+              <div className="text-center">
+                <p className="text-muted-foreground bg-muted/50 rounded-xl p-4 inline-block">💡 {t.priceDisclaimer}</p>
               </div>
             </div>
-
-            <div className="text-center">
-              <p className="text-muted-foreground bg-muted/50 rounded-xl p-4 inline-block">💡 {t.priceDisclaimer}</p>
-            </div>
-          </div>
-        )}
+          )}
+        </SignedIn>
       </main>
 
       <footer className="relative z-10 mt-16 pb-8">
